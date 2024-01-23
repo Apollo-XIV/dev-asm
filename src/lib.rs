@@ -1,7 +1,7 @@
 pub mod app;
 pub mod components;
 #[cfg(feature="ssr")]
-pub(crate) mod database;
+pub mod database;
 use cfg_if::cfg_if;
 
 cfg_if! {
@@ -20,3 +20,6 @@ if #[cfg(feature = "hydrate")] {
     }
 }
 }
+
+#[cfg(feature = "ssr")]
+const DATE_FORMAT: &str = "%d/%m/%Y %H:%M";

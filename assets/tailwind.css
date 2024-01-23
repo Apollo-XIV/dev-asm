@@ -682,9 +682,9 @@ video {
   background-color: rgb(252 211 77 / var(--tw-bg-opacity));
 }
 
-.bg-blue-950 {
+.bg-slate-900 {
   --tw-bg-opacity: 1;
-  background-color: rgb(23 37 84 / var(--tw-bg-opacity));
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity));
 }
 
 .p-1 {

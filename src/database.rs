@@ -1,27 +1,13 @@
 use sqlx::{PgPool, Pool, postgres::PgPoolOptions};
+use sqlx::types::chrono::{DateTime, Utc};
 
-#[derive(Debug)]
-struct Thread {
-	id: i32,
-	name: String,
-	test: i32
-}
 
-async fn get_threads(pool: &PgPool) -> Result<Vec<Thread>,sqlx::Error> {
-	let threads = sqlx::query_as!(
-		Thread,
-		r#"SELECT id, name, test FROM threads;"#
-	)
-	.
-	.fetch_all(pool)
-	.await?;
-	Ok(threads)
-}
+
 
 static DB: std::sync::OnceLock<sqlx::PgPool> = std::sync::OnceLock::new();
 
 async fn create_pool() -> sqlx::PgPool {
-    let database_url = std::env::var("DATABASE_URL").expect("no database url specify");
+    let database_url = std::env::var("DATABASE_URL").expect("no database url specified");
     let pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(4)
         .connect(database_url.as_str())
