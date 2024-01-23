@@ -19,7 +19,7 @@ pub fn App() -> impl IntoView {
 
         // content for this welcome page
         <Router>
-            <body class="bg-blue-950 flex place-items-center min-h-screen">
+            <body class="bg-slate-950 flex place-items-center min-h-screen">
                 <Nav />
                 <main class="max-w-3xl h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
                     <Routes>

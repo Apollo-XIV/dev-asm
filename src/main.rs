@@ -8,6 +8,7 @@ async fn main() -> std::io::Result<()> {
     use leptos_actix::{generate_route_list, LeptosRoutes};
 
     let conf = get_configuration(None).await.unwrap();
+    crate::database::init_db().await.expect("problem connecting to db");
     let addr = conf.leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
     let routes = generate_route_list(App);

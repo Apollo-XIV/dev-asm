@@ -1,5 +1,7 @@
 pub mod app;
 pub mod components;
+#[cfg(feature="ssr")]
+pub(crate) mod database;
 use cfg_if::cfg_if;
 
 cfg_if! {
