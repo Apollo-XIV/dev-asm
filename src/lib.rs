@@ -1,6 +1,6 @@
 pub mod app;
 pub mod components;
-#[cfg(feature="ssr")]
+#[cfg(feature = "ssr")]
 pub mod database;
 use cfg_if::cfg_if;
 

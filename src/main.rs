@@ -9,12 +9,14 @@ async fn main() -> std::io::Result<()> {
 
     dotenv::dotenv().ok();
     let conf = get_configuration(None).await.unwrap();
-    finite_humour::database::init_db().await.expect("problem connecting to db");
+    finite_humour::database::init_db()
+        .await
+        .expect("problem connecting to db");
     let addr = conf.leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
     let routes = generate_route_list(App);
     println!("listening on http://{}", &addr);
-    
+
     HttpServer::new(move || {
         let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;

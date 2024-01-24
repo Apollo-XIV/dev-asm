@@ -110,25 +110,30 @@ pub struct Test {
 #[server(GetDatabaseTest)]
 pub async fn get_database_test() -> Result<Vec<Test>, ServerFnError> {
     println!("testing");
-    use crate::database::get_db;
-    Ok(database_call().await.unwrap())
-}
-
-#[cfg(feature = "ssr")]
-async fn database_call() -> Result<Vec<Test>, sqlx::Error> {
     use crate::database;
-    sqlx::query!(
-        r#"
-            SELECT * FROM test;
-        "#
-    )
-    .map(|row| Test {
-        id: row.id,
-        name: row.name,
-        created_at: row.created_at.format(super::DATE_FORMAT).to_string(),
-    })
-    .fetch_all(database::get_db())
-    .await
+    use sqlx::{
+        postgres::PgRow,
+        query,
+        types::chrono::{DateTime, Utc},
+        Error, Row,
+    };
+    match query(r#"SELECT * FROM test;"#)
+        .map(|row: PgRow| Test {
+            id: row.get("id"),
+            name: row.get("name"),
+            created_at: row
+                .get::<DateTime<Utc>, &str>("created_at")
+                .format(crate::DATE_FORMAT)
+                .to_string(),
+        })
+        .fetch_all(database::get_db())
+        .await
+    {
+        Ok(x) => Ok(dbg!(x)),
+        Error => Err(ServerFnError::ServerError(
+            "Something bad happened :/".to_string(),
+        )),
+    }
 }
 
 /// 404 - Not Found
