@@ -83,6 +83,7 @@ fn Activity() -> impl IntoView {
 #[component]
 fn RecentThreads() -> impl IntoView {
     let test_action = create_server_action::<GetDatabaseTest>();
+    let (count, set_count) = create_signal(0);
     let submitted = test_action.input();
     let pending = test_action.pending();
     let test_data = test_action.value();
@@ -93,7 +94,19 @@ fn RecentThreads() -> impl IntoView {
                     <button type="submit">
                         "I'm basically a button"
                     </button>
+                    <div class="cursor-pointer" on:click=move |_| {set_count.set(count.get() + 1)} >
+                        {count}
+                    </div>
                     <p>{move || pending().then(|| "Test");}</p>
+                    <div>{move || match test_data() {
+                        Some(x) => x.iter().map(|test: Test| view!{<p>{test.name}</p>}).collect(),
+                        None => vec![view! {<p>"empty :("</p>}]
+                    }
+                    }</div>
+                    <p>{move || match test_data() {
+                        Some(test) => test.unwrap().first().unwrap().clone().name,
+                        None => "none".to_string()
+                    }}</p>
                 </ActionForm>
                 <Todo class="h-64"/>
             </Panel>
