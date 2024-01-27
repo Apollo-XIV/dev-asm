@@ -87,6 +87,16 @@ fn RecentThreads() -> impl IntoView {
     let submitted = test_action.input();
     let pending = test_action.pending();
     let test_data = test_action.value();
+    let unwrapped = move || {
+        if let Some(x) = test_data.get() {
+            match x {
+                Ok(x) => x,
+                _ => vec![],
+            }
+        } else {
+            vec![]
+        }
+    };
     view! {
         <div class="grow basis-full">
             <Panel title="Recent Threads">
@@ -98,11 +108,9 @@ fn RecentThreads() -> impl IntoView {
                         {count}
                     </div>
                     <p>{move || pending().then(|| "Test");}</p>
-                    <div>{move || match test_data() {
-                        Some(x) => x.iter().map(|test: Test| view!{<p>{test.name}</p>}).collect(),
-                        None => vec![view! {<p>"empty :("</p>}]
-                    }
-                    }</div>
+                    <For each=unwrapped key=|state|state.id let:child>
+                        <p>{child.name}</p>
+                    </For>
                     <p>{move || match test_data() {
                         Some(test) => test.unwrap().first().unwrap().clone().name,
                         None => "none".to_string()
