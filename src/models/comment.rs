@@ -52,18 +52,18 @@ pub async fn get_by_thread_id(id: i32) -> Result<Vec<Comment>, ServerFnError> {
 #[server(NewComment)]
 pub async fn new_comment(
     message: String,
-    authorid: i32,
-    threadid: i32,
+    author_id: i32,
+    thread_id: i32,
 ) -> Result<(), ServerFnError> {
-    println!("{} from {}", message, authorid);
+    println!("{} from {} on {}", message, author_id, thread_id);
     use crate::database::get_db;
     use sqlx::query;
     match query!(
         "INSERT INTO comment (message, author_id, thread_id) VALUES
         ($1, $2, $3)",
         message,
-        authorid,
-        threadid
+        author_id,
+        thread_id
     )
     .execute(get_db())
     .await
