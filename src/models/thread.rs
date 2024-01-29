@@ -23,29 +23,43 @@ pub struct Thread {
 #[server]
 pub async fn get_all_raw() -> Result<Vec<ThreadRaw>, ServerFnError> {
     use crate::database;
-    use sqlx::{query, query_as};
-    match query_as!(
-        ThreadRaw,
-        r#"SELECT id, title, date, author_id FROM Thread;"#
+    use sqlx::query_as;
+    query_as!(ThreadRaw, "SELECT id, title, date, author_id FROM Thread;")
+        .fetch_all(database::get_db())
+        .await
+        .map_err(|err| ServerFnError::ServerError(err.to_string()))
+}
+
+#[server]
+pub async fn get_by_id(id: i32) -> Result<Thread, ServerFnError> {
+    use crate::database::get_db;
+    use sqlx::query;
+    query!(
+        "SELECT t.id, t.title, t.date, m.username
+         FROM Thread as t
+         INNER JOIN Member as m ON t.author_id=m.id
+         WHERE t.id=$1",
+        id
     )
-    .fetch_all(database::get_db())
+    .map(|x| Thread {
+        id: x.id,
+        title: x.title,
+        date: x.date,
+        author: x.username,
+    })
+    .fetch_one(get_db())
     .await
-    {
-        Ok(x) => Ok(x),
-        Err(x) => Err(ServerFnError::ServerError(
-            "something went wrong connecting to the database".to_string(),
-        )),
-    }
+    .map_err(|err| ServerFnError::ServerError(err.to_string()))
 }
 
 #[server]
 pub async fn get_all() -> Result<Vec<Thread>, ServerFnError> {
     use crate::database;
     use sqlx::{query, query_as};
-    match query!(
+    query!(
         "SELECT Thread.id, Thread.title, Thread.date, Member.username
-        FROM Thread
-        INNER JOIN Member ON Thread.author_id=Member.id"
+         FROM Thread
+         INNER JOIN Member ON Thread.author_id=Member.id"
     )
     .map(|x| Thread {
         id: x.id,
@@ -55,10 +69,5 @@ pub async fn get_all() -> Result<Vec<Thread>, ServerFnError> {
     })
     .fetch_all(database::get_db())
     .await
-    {
-        Ok(x) => Ok(x),
-        Err(x) => Err(ServerFnError::ServerError(
-            "something went wrong connecting to the database".to_string(),
-        )),
-    }
+    .map_err(|err| ServerFnError::ServerError(err.to_string()))
 }

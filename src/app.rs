@@ -1,5 +1,5 @@
 use crate::components::{nav::Nav, panel::Panel, todo::Todo};
-use crate::routes::forum::ForumPage;
+use crate::routes::{forum, thread};
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -26,7 +26,10 @@ pub fn App() -> impl IntoView {
                 <main class="max-w-3xl h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
                     <Routes>
                         <Route path="" view=HomePage/>
-                        <Route path="/forum" view=ForumPage />
+                        <Route path="/forum" view=|| view!{<Outlet />}>
+                            <Route path=":id" view=thread::Page />
+                            <Route path="" view=forum::Page />
+                        </Route>
                         <Route path="/*any" view=NotFound/>
                     </Routes>
                 </main>

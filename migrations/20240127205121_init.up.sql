@@ -37,8 +37,3 @@ insert into Comment (message, author_id, thread_id) values
     ( 'basic sample text', 1, 1),
     ( 'basic sample text', 2, 2);
 
--- creating a comment on each thread
-insert into Comment (message, author_id, thread_id) values
-    ('Hello testUser', 2, 1),
-    ('Hello testUser2', 1, 2);
-
