@@ -23,7 +23,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <body class="bg-slate-900 flex place-items-center min-h-screen">
                 <Nav />
-                <main class="max-w-3xl h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
+                <main class="max-w-3xl max-h-screen overflow-y-scroll overflow-x-hidden h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
                     <Routes>
                         <Route path="" view=HomePage/>
                         <Route path="/forum" view=|| view!{<Outlet />}>

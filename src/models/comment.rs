@@ -14,7 +14,7 @@ pub struct CommentRaw {
     date: DateTime<Utc>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Comment {
     pub id: i32,
     pub message: String,

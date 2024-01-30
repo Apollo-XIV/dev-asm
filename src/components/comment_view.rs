@@ -1,6 +1,7 @@
 use crate::components::panel::Panel as PanelTemplate;
 use crate::models::comment;
 use crate::utils::time_since;
+use leptos::logging::log;
 use leptos::*;
 use leptos_router::*;
 
@@ -23,7 +24,10 @@ pub fn Panel(data: comment::Comment) -> impl IntoView {
 #[component]
 pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
     let post_comment = create_server_action::<comment::NewComment>();
-    create_effect(move |_| {post_comment.version().get(); alert.update(|value| *value = !*value);}) ;
+    create_effect(move |_| {
+        post_comment.version().get();
+        alert.update(|value| *value = !*value);
+    });
     view! {
         <PanelTemplate
             class="w-full"
@@ -35,7 +39,8 @@ pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
                     name="message"
                     rows=2
                     placeholder="Write your comment here..."
-                    class="focus:outline-none bg-transparent w-full p-2 text-wrap"/>
+                    class="focus:outline-none bg-transparent w-full p-2 text-wrap"
+                    prop:value=move|| {post_comment.version().get(); log!("i ran"); ""}/>
                 <button
                     type="submit"
                     class="w-full max-w-24 text-blue-950 float-right bg-amber-300 h-8 rounded-sm">
@@ -56,17 +61,19 @@ pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
 
 #[component]
 pub fn Thread(id: i32, refetch: ReadSignal<bool>) -> impl IntoView {
-    let comments = create_resource(
-        move || (),
-        move |_| comment::get_by_thread_id(id),
-    );
+    let comments = create_blocking_resource(move || (), move |_| comment::get_by_thread_id(id));
+    create_effect(move |_| {
+        refetch.get();
+        comments.refetch()
+    });
     view! {
-        //`<p>{move || comments().map(|some| some.map(|ok| "test"))}</p>
-        // {move || match comments() {
-        //     Some(Ok(x)) => view!{<ThreadView data=x.clone() />},
-        //     Some(Err(_x)) => view!{<Error />},
-        //     None => view!{<p>"loading.."</p>}.into_view()
-        // }}
+        <Transition fallback=||()>
+            <ErrorBoundary fallback=|_err|view!{<div class="w-12 h-12 bg-green-500"/>} >
+                {move || comments().and_then(|resulted| Some(resulted.and_then(|comments| Ok(view!{
+                    <ThreadView data=comments />
+                }))))}
+            </ErrorBoundary>
+        </Transition>
     }
 }
 
