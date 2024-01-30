@@ -1,3 +1,5 @@
+use std::{thread::sleep, time::Duration};
+
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use leptos::*;
 use serde::{Deserialize, Serialize};
@@ -58,6 +60,7 @@ pub async fn new_comment(
     println!("{} from {} on {}", message, author_id, thread_id);
     use crate::database::get_db;
     use sqlx::query;
+    // sleep(Duration::from_secs(10));
     match query!(
         "INSERT INTO comment (message, author_id, thread_id) VALUES
         ($1, $2, $3)",
