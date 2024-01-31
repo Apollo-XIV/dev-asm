@@ -1,4 +1,5 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
+use leptos::logging::log;
 use leptos::*;
 use serde::{Deserialize, Serialize};
 
@@ -81,16 +82,27 @@ pub async fn new_thread(
 ) -> Result<(), ServerFnError> {
     use crate::database::get_db;
     use sqlx::query;
-    match query!(
+    log!("{}{}{}", title, message, author_id);
+    let mut tx = get_db().begin().await?;
+    let new_thread_id = query!(
         "INSERT INTO thread (title, author_id)
-         VALUES ($1, $2)",
+                 VALUES ($1, $2) RETURNING id;",
         title,
-        author_id
+        author_id,
     )
-    .execute(get_db())
-    .await
-    {
-        Ok(x) => Ok(()),
-        Err(err) => Err(ServerFnError::ServerError(err.to_string())),
-    }
+    .map(|row| row.id)
+    .fetch_one(&mut *tx)
+    .await?;
+    query!(
+        "INSERT INTO Comment (message, author_id, thread_id)
+        VALUES ($1, $2, $3)",
+        message,
+        author_id,
+        new_thread_id
+    )
+    .execute(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    leptos_actix::redirect(&format!("/forum/{new_thread_id}"));
+    Ok(())
 }

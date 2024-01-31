@@ -17,7 +17,7 @@ pub fn Page() -> impl IntoView {
                 .cloned()
                 .unwrap_or_default()
                 .parse()
-                .unwrap()
+                .unwrap_or(1)
         },
         |thread_id| async move { thread::get_by_id(thread_id).await },
     );
@@ -45,18 +45,20 @@ pub fn New() -> impl IntoView {
     let new_thread = create_server_action::<thread::NewThread>();
     view! {
         <Panel title="Create a new thread" class="w-full" >
-            <ActionForm action=new_thread class="divide-y divide-amber-200 divide-dashed" >
-                <input type="hidden" name="author_id" value="1" />
+            <ActionForm action=new_thread >
+                <input type="hidden"  name="author_id" value="1" />
                 <input
+                    autocomplete="off"
                     name="title"
                     type="text"
                     class="w-full text-lg bg-transparent p-2 focus:outline-none"
                     placeholder="Title your new thread..."/>
-                <div class="bg-gradient-to-r from-transparent via-amber-300 to-transparent h-[1px]"/>
+                <p tabindex="-1" class="pointer-events-none text-center text-md h-[2px] font-mono overflow-x-hidden opacity-60 leading-[0px]">"---------------------------------------------------------------------------------------------------"</p>
                 <textarea
+                    autocomplete="off"
                     name="message"
                     rows=3
-                    placeholder="Add further details to your thread and begin the conversation"
+                    placeholder="Begin the conversation"
                     class="focus:outline-none bg-transparent w-full p-2 text-wrap"/>
                 <button
                     type="submit"
