@@ -71,3 +71,26 @@ pub async fn get_all() -> Result<Vec<Thread>, ServerFnError> {
     .await
     .map_err(|err| ServerFnError::ServerError(err.to_string()))
 }
+
+#[server(NewThread)]
+/// Creates a new thread, along with an initial comment
+pub async fn new_thread(
+    title: String,
+    message: String,
+    author_id: i32,
+) -> Result<(), ServerFnError> {
+    use crate::database::get_db;
+    use sqlx::query;
+    match query!(
+        "INSERT INTO thread (title, author_id)
+         VALUES ($1, $2)",
+        title,
+        author_id
+    )
+    .execute(get_db())
+    .await
+    {
+        Ok(x) => Ok(()),
+        Err(err) => Err(ServerFnError::ServerError(err.to_string())),
+    }
+}

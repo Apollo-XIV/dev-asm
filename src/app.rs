@@ -27,6 +27,7 @@ pub fn App() -> impl IntoView {
                     <Routes>
                         <Route path="" view=HomePage/>
                         <Route path="/forum" view=|| view!{<Outlet />}>
+                            <Route path="/new" view=thread::New />
                             <Route path=":id" view=thread::Page />
                             <Route path="" view=forum::Page />
                         </Route>

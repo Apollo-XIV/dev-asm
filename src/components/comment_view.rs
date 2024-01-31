@@ -40,7 +40,7 @@ pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
                     rows=2
                     placeholder="Write your comment here..."
                     class="focus:outline-none bg-transparent w-full p-2 text-wrap"
-                    prop:value=move|| {post_comment.version().get(); log!("i ran"); ""}/>
+                    prop:value=move|| {post_comment.version().get(); ""}/>
                 <button
                     type="submit"
                     class="w-full max-w-24 text-blue-950 float-right bg-amber-300 h-8 rounded-sm">
