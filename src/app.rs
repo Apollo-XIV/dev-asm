@@ -11,8 +11,6 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        // injects a stylesheet into the document <head>
-        // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/leptos-start.css"/>
         <Stylesheet id="leptos" href="/assets/tailwind.css"/>
 
@@ -22,16 +20,16 @@ pub fn App() -> impl IntoView {
         // content for this welcome page
         <Router>
             <body class="bg-slate-900 flex place-items-center min-h-screen">
-                <Nav />
+                <Nav/>
                 <main class="max-w-3xl max-h-screen overflow-y-scroll overflow-x-hidden h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
                     <Routes>
                         <Route path="" view=HomePage/>
-                        <Route path="/forum" view=|| view!{<Outlet />}>
-                            <Route path="/new" view=thread::New />
-                            <Route path=":id" view=thread::Page />
-                            <Route path="" view=forum::Page />
+                        <Route path="/forum" view=|| view! { <Outlet/> }>
+                            <Route path="/new" view=thread::New/>
+                            <Route path=":id" view=thread::Page/>
+                            <Route path="" view=forum::Page/>
                         </Route>
-                        <Route path="/signup" view=signup::Page />
+                        <Route path="/signup" view=signup::Page/>
                         <Route path="/*any" view=NotFound/>
                     </Routes>
                 </main>
@@ -44,9 +42,9 @@ pub fn App() -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     view! {
-        <Stats />
-        <Activity />
-        <RecentThreads />
+        <Stats/>
+        <Activity/>
+        <RecentThreads/>
     }
 }
 
@@ -62,7 +60,6 @@ fn Stats() -> impl IntoView {
                 </div>
             </Panel>
         </div>
-
     }
 }
 
@@ -70,8 +67,8 @@ fn Stats() -> impl IntoView {
 fn Stat(#[prop(into)] fig: TextProp, #[prop(into)] label: TextProp) -> impl IntoView {
     view! {
         <div class="basis-28 shrink">
-        <h1 class="text-xl">{fig}</h1>
-        <p>{label}</p>
+            <h1 class="text-xl">{fig}</h1>
+            <p>{label}</p>
         </div>
     }
 }
@@ -91,7 +88,7 @@ fn Activity() -> impl IntoView {
 fn RecentThreads() -> impl IntoView {
     let test_action = create_server_action::<GetDatabaseTest>();
     let (count, set_count) = create_signal(0);
-    let submitted = test_action.input();
+    let _submitted = test_action.input();
     let pending = test_action.pending();
     let test_data = test_action.value();
     let unwrapped = move || {
@@ -108,20 +105,27 @@ fn RecentThreads() -> impl IntoView {
         <div class="grow basis-full">
             <Panel title="Recent Threads">
                 <ActionForm action=test_action>
-                    <button type="submit">
-                        "I'm basically a button"
-                    </button>
-                    <div class="cursor-pointer" on:click=move |_| {set_count.set(count.get() + 1)} >
+                    <button type="submit">"I'm basically a button"</button>
+                    <div
+                        class="cursor-pointer"
+                        on:click=move |_| { set_count.set(count.get() + 1) }
+                    >
                         {count}
                     </div>
-                    <p>{move || pending().then(|| "Test");}</p>
-                    <For each=unwrapped key=|state|state.id let:child>
+                    <p>
+                        {
+                            move || pending().then(|| "Test");
+                        }
+                    </p>
+                    <For each=unwrapped key=|state| state.id let:child>
                         <p>{child.name}</p>
                     </For>
-                    <p>{move || match test_data() {
-                        Some(test) => test.unwrap().first().unwrap().clone().name,
-                        None => "none".to_string()
-                    }}</p>
+                    <p>
+                        {move || match test_data() {
+                            Some(test) => test.unwrap().first().unwrap().clone().name,
+                            None => "none".to_string(),
+                        }}
+                    </p>
                 </ActionForm>
                 <Todo class="h-64"/>
             </Panel>
@@ -158,7 +162,7 @@ pub async fn get_database_test() -> Result<Vec<Test>, ServerFnError> {
         .await
     {
         Ok(x) => Ok(dbg!(x)),
-        Error => Err(ServerFnError::ServerError(
+        Err(_) => Err(ServerFnError::ServerError(
             "Something bad happened :/".to_string(),
         )),
     }
@@ -182,6 +186,8 @@ fn NotFound() -> impl IntoView {
     }
 
     view! {
-        <Panel title="404"><div class="p-4">"Not Found"</div></Panel>
+        <Panel title="404">
+            <div class="p-4">"Not Found"</div>
+        </Panel>
     }
 }

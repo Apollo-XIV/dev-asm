@@ -8,10 +8,14 @@ pub fn Thread(#[prop(into)] data: thread::Thread) -> impl IntoView {
     view! {
         <div class="grow w-full max-w-3xl">
             <Panel
-                title={data.author}
-                caption={format!("{} | {} ago",data.date.format("%d/%m/%y"), utils::time_since(data.date))}
+                title=data.author
+                caption=format!(
+                    "{} | {} ago",
+                    data.date.format("%d/%m/%y"),
+                    utils::time_since(data.date),
+                )
             >
-                <a href={format!("/forum/{}", data.id)} class="text-lg font-bold hover:underline">
+                <a href=format!("/forum/{}", data.id) class="text-lg font-bold hover:underline">
                     {data.title}
                 </a>
             </Panel>

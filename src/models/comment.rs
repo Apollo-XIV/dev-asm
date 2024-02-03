@@ -1,5 +1,3 @@
-use std::{thread::sleep, time::Duration};
-
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use leptos::*;
 use serde::{Deserialize, Serialize};
@@ -71,7 +69,7 @@ pub async fn new_comment(
     .execute(get_db())
     .await
     {
-        Ok(x) => Ok(()),
+        Ok(_x) => Ok(()),
         Err(err) => dbg!(Err(ServerFnError::ServerError(err.to_string()))),
     }
 }

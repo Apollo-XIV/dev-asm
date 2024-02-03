@@ -1,4 +1,3 @@
-use sqlx::types::chrono::{DateTime, Utc};
 use sqlx::{postgres::PgPoolOptions, PgPool, Pool};
 
 static DB: std::sync::OnceLock<sqlx::PgPool> = std::sync::OnceLock::new();

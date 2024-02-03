@@ -25,5 +25,20 @@ if #[cfg(feature = "hydrate")] {
 }
 }
 
-#[cfg(feature = "ssr")]
 const DATE_FORMAT: &str = "%d/%m/%Y %H:%M";
+use once_cell::sync::Lazy;
+use reqwest::Client;
+use std::sync::Mutex;
+pub static RQ: Lazy<Mutex<Client>> = Lazy::new(|| Mutex::new(Client::new()));
+
+#[cfg(feature = "ssr")]
+use lazy_static::lazy_static;
+#[cfg(feature = "ssr")]
+lazy_static! {
+    pub static ref CLIENT_ID: String = std::env::var("GITHUB_CLIENT_ID").unwrap();
+}
+
+#[cfg(feature = "ssr")]
+lazy_static! {
+    pub static ref CLIENT_SECRET: String = std::env::var("GITHUB_CLIENT_SECRET").unwrap();
+}
