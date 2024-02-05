@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use leptos::*;
 
 const SECONDS_P_YEAR: i64 = 31_536_000;
 const SECONDS_P_MONTH: i64 = 2_592_000;
@@ -16,4 +17,10 @@ pub fn time_since(dt: DateTime<Utc>) -> String {
         s if s > SECONDS_P_MINUTE => format!("{}m", s / SECONDS_P_MINUTE),
         s => format!("{}s", s),
     }
+}
+
+#[server]
+pub async fn get_client_id() -> Result<String, ServerFnError> {
+    use crate::CLIENT_ID;
+    Ok(CLIENT_ID.to_owned())
 }

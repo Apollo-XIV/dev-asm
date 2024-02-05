@@ -5,6 +5,8 @@ pub mod components;
 pub mod database;
 pub mod models;
 pub mod routes;
+#[cfg(feature = "ssr")]
+pub mod state;
 pub mod utils;
 use cfg_if::cfg_if;
 

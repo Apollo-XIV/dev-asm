@@ -1,3 +1,12 @@
+use finite_humour::auth::AuthState;
+use finite_humour::state::AppState;
+use leptos_router::State;
+use leptos_router::RouteListing;
+use actix_web::HttpRequest;
+use leptos::provide_context;
+use reqwest::Request;
+use leptos_actix::handle_server_fns_with_context;
+
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -14,22 +23,28 @@ async fn main() -> std::io::Result<()> {
         .expect("problem connecting to db");
     let addr = conf.leptos_options.site_addr;
     // Generate the list of routes in your Leptos App
+    let leptos_options = conf.leptos_options;
     let routes = generate_route_list(App);
     println!("listening on http://{}", &addr);
 
+    let app_state = AppState {
+        leptos_options: leptos_options.clone(),
+        routes: routes.clone(),
+    };
+
     HttpServer::new(move || {
-        let leptos_options = &conf.leptos_options;
+        // let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;
 
         App::new()
-            .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
+            .route("/api/{tail:.*}", leptos_actix::handle_server_fns_with_context(|| provide_context("testData")))
             // serve JS/WASM/CSS from `pkg`
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
             // serve other assets from the `assets` directory
             .service(Files::new("/assets", site_root))
             // serve the favicon from /favicon.ico
             .service(favicon)
-            .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
+            .leptos_routes_with_context(leptos_options.to_owned(), routes.to_owned(), ||provide_context("testData"), App)
             .app_data(web::Data::new(leptos_options.to_owned()))
         //.wrap(middleware::Compress::default())
     })

@@ -1,3 +1,4 @@
+use crate::auth::try_auth;
 use crate::components::{nav::Nav, panel::Panel, todo::Todo};
 use crate::routes::{forum, signup, thread};
 use leptos::*;
@@ -9,7 +10,8 @@ use serde::{Deserialize, Serialize};
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
-
+    let session = create_resource(|| (), move |_| try_auth()); // some or none member
+    provide_context(session);
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-start.css"/>
         <Stylesheet id="leptos" href="/assets/tailwind.css"/>
