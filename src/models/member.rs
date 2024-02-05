@@ -8,3 +8,9 @@ pub struct Member {
     #[serde(with = "ts_seconds")]
     date: DateTime<Utc>,
 }
+
+impl Member {
+    fn new() -> Self {
+        Member {}
+    }
+}

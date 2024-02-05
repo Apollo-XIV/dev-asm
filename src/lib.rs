@@ -36,9 +36,6 @@ use lazy_static::lazy_static;
 #[cfg(feature = "ssr")]
 lazy_static! {
     pub static ref CLIENT_ID: String = std::env::var("GITHUB_CLIENT_ID").unwrap();
-}
-
-#[cfg(feature = "ssr")]
-lazy_static! {
     pub static ref CLIENT_SECRET: String = std::env::var("GITHUB_CLIENT_SECRET").unwrap();
+    pub static ref AUTH_SECRET: String = std::env::var("AUTH_SECRET").unwrap();
 }
