@@ -1,6 +1,6 @@
-use crate::auth::try_auth;
 use crate::components::{nav::Nav, panel::Panel, todo::Todo};
 use crate::routes::{forum, signup, thread};
+use crate::state::try_auth;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;

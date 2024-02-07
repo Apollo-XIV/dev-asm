@@ -1,14 +1,15 @@
 pub mod app;
+#[cfg(feature = "ssr")]
 pub mod auth;
 pub mod components;
-#[cfg(feature = "ssr")]
-pub mod database;
 pub mod models;
 pub mod routes;
-#[cfg(feature = "ssr")]
+// #[cfg(feature = "ssr")]
 pub mod state;
 pub mod utils;
 use cfg_if::cfg_if;
+#[cfg(feature = "ssr")]
+pub mod database;
 
 cfg_if! {
 if #[cfg(feature = "hydrate")] {

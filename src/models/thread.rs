@@ -103,6 +103,6 @@ pub async fn new_thread(
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
-    leptos_actix::redirect(&format!("/forum/{new_thread_id}"));
+    leptos_actix::redirect(&format!("/forum/{new_thread_id:?}"));
     Ok(())
 }

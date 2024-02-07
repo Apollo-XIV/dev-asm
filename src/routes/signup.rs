@@ -1,5 +1,5 @@
-use crate::auth::{self, AuthState};
 use crate::components::panel::Panel;
+use crate::state::AuthState;
 use crate::utils;
 use leptos::logging::log;
 use leptos::*;
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub fn Page() -> impl IntoView {
     let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
     let grab_cookie = create_server_action::<GrabCookie>();
-    let session = use_context::<Resource<(), AuthState>>();
+    let session = use_context::<AuthState>();
     view! {
         <Suspense fallback=||()>
             <ErrorBoundary fallback=|_err| view!{<p>"Error"</p>} >
@@ -24,7 +24,7 @@ pub fn Page() -> impl IntoView {
                     <Panel title="cookie test">
                         <button on:click=move|_|grab_cookie.dispatch(GrabCookie{}) >"gimmie a cookie"</button>
                     </Panel>
-                <p>"logged in as:"{move || dbg!(session.map(|rsc| rsc.get().map(move |val| val.name())))}</p>
+                // <p>"logged in as:"{move || session.map(|rsc| rsc.name())}</p>
             </ErrorBoundary>
         </Suspense>
     }

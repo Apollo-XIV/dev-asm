@@ -1,9 +1,42 @@
 use crate::models::member::Member;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
 use leptos::logging::log;
 use leptos::*;
 use serde::{Deserialize, Serialize};
+use std::future::{ready, Ready};
+
+use crate::state::AppState;
+pub use actix_web::error::ErrorUnauthorized;
+pub use actix_web::{dev::Payload, Error as ActixWebError};
+pub use actix_web::{http, web, FromRequest, HttpMessage, HttpRequest};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
+
+pub struct MiddlewareTest {
+    pub string: String,
+}
+
+impl FromRequest for MiddlewareTest {
+    type Error = ActixWebError;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let data = req.app_data::<web::Data<AppState>>().unwrap();
+        let test = req
+            .cookie("test")
+            .map(|c| c.value().to_string())
+            .or_else(|| {
+                req.headers()
+                    .get(http::header::AUTHORIZATION)
+                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
+            });
+        log!("{test:?}");
+
+        match test {
+            Some(string) => ready(Ok(MiddlewareTest { string })),
+            None => ready(Err(ErrorUnauthorized(""))),
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims {
@@ -11,17 +44,6 @@ pub struct Claims {
     iat: usize,
     exp: usize,
     ua_token: String, // used to access github and check user details
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct AuthState {
-    user: String,
-}
-
-impl AuthState {
-    pub fn name(&self) -> String {
-        self.user.clone()
-    }
 }
 
 #[cfg(feature = "ssr")]
@@ -129,27 +151,6 @@ async fn exchange_code(code: String) -> Result<String, &'static str> {
     Ok(value)
 }
 
-#[server(TryAuth)]
-pub async fn try_auth() -> Result<AuthState, ServerFnError> {
-    use actix_web::{
-        cookie::{Cookie, SameSite},
-        http::header,
-        http::header::HeaderValue,
-        HttpRequest,
-    };
-    log!("I'm running!!!!");
-    use chrono::DateTime;
-    use leptos_actix::ResponseOptions;
-    let req = dbg!(expect_context::<HttpRequest>().cookies())
-        // .cookie("auth_token")
-        .map_err(|_| ServerFnError::ServerError(dbg!("Could not find auth token").to_string()))?
-        // .value()
-        .to_owned();
-    log!("I ran {req:?}");
-    Ok(AuthState {
-        user: "test".to_string(),
-    })
-}
 #[cfg(feature = "ssr")]
 async fn user_info(token: String) -> Result<String, &'static str> {
     use crate::{CLIENT_ID, CLIENT_SECRET, RQ};
