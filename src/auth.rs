@@ -1,4 +1,3 @@
-use crate::models::member::Member;
 use chrono::{Duration, Utc};
 use leptos::logging::log;
 use leptos::*;
@@ -10,33 +9,6 @@ pub use actix_web::error::ErrorUnauthorized;
 pub use actix_web::{dev::Payload, Error as ActixWebError};
 pub use actix_web::{http, web, FromRequest, HttpMessage, HttpRequest};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-
-pub struct MiddlewareTest {
-    pub string: String,
-}
-
-impl FromRequest for MiddlewareTest {
-    type Error = ActixWebError;
-    type Future = Ready<Result<Self, Self::Error>>;
-
-    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let data = req.app_data::<web::Data<AppState>>().unwrap();
-        let test = req
-            .cookie("test")
-            .map(|c| c.value().to_string())
-            .or_else(|| {
-                req.headers()
-                    .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
-            });
-        log!("{test:?}");
-
-        match test {
-            Some(string) => ready(Ok(MiddlewareTest { string })),
-            None => ready(Err(ErrorUnauthorized(""))),
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims {

@@ -28,7 +28,10 @@ lazy_static = "1.4.0"
 itertools = "0.12.1"
 serde_json = "1.0.113"
 jsonwebtoken = "9.2.0"
-actix-session = { version = "0.9.0", features = ["cookie-session", "actix"] }
+actix-session = { version = "0.9.0", features = ["cookie-session", "actix"], optional = true }
+actix-jwt-auth-middleware = {version = "0.3.0", optional = true }
+jwt-compact = { version = "0.8.0", features = ["exonum-crypto"], optional = true }
+exonum-crypto = { version = "1.0.0", optional = true }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -36,8 +39,12 @@ hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
   "dep:actix-files",
   "dep:actix-web",
+  "dep:actix-session",
   "dep:leptos_actix",
+  "dep:jwt-compact",
+  "dep:exonum-crypto",
   "dep:sqlx",
+  "dep:actix-jwt-auth-middleware",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",

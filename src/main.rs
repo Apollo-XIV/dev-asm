@@ -1,11 +1,23 @@
+use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "ssr")]
+#[derive(Serialize, Deserialize, Clone, Debug, actix_jwt_auth_middleware::FromRequest)]
+struct User {
+    id: u32,
+}
+
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_files::Files;
+    use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
+    use actix_session::storage::CookieSessionStore;
+    use actix_session::SessionMiddleware;
+    use actix_web::cookie::Key;
     use actix_web::HttpRequest;
     use actix_web::*;
     use finite_humour::app::*;
-    use finite_humour::auth::MiddlewareTest;
+    use finite_humour::state::AppState;
     use finite_humour::AUTH_SECRET;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
@@ -24,6 +36,25 @@ async fn main() -> std::io::Result<()> {
     let app_state = AppState {
         leptos_options: leptos_options.clone(),
     };
+    use actix_jwt_auth_middleware::{Authority, TokenSigner};
+    use exonum_crypto::{KeyPair, Seed};
+    use jwt_compact::alg::Ed25519;
+    use jwt_compact::Algorithm;
+
+    let key_pair = KeyPair::from_seed(&Seed::from_slice(AUTH_SECRET.as_bytes()).unwrap());
+
+    let authority = Authority::<User, Ed25519, _, _>::new()
+        .refresh_authorizer(|| async move { Ok(()) })
+        .token_signer(Some(
+            TokenSigner::new()
+                .signing_key(key_pair.secret_key().clone())
+                .algorithm(Ed25519)
+                .build()
+                .expect("failed"),
+        ))
+        .verifying_key(key_pair.public_key())
+        .build()
+        .expect("");
 
     HttpServer::new(move || {
         // let leptos_options = &conf.leptos_options;
@@ -47,19 +78,26 @@ async fn main() -> std::io::Result<()> {
                 App,
             )
             .app_data(web::Data::new(leptos_options.to_owned()))
-            .wrap(
-                SessionMiddleware::builder(
-                    CookieSessionStore::default(),
-                    Key::from(AUTH_SECRET.as_bytes()),
-                )
-                .cookie_secure(false)
-                .build(),
-            )
+            .use_jwt(authority, web::scope("/hello").service(hello))
+        // .wrap(
+        //     SessionMiddleware::builder(
+        //         CookieSessionStore::default(),
+        //         Key::from(AUTH_SECRET.as_bytes()),
+        //     )
+        //     .cookie_secure(false)
+        //     .build(),
+        // )
         //.wrap(middleware::Compress::default())
     })
     .bind(&addr)?
     .run()
     .await
+}
+
+#[cfg(feature = "ssr")]
+#[actix_web::get("/hello")]
+async fn hello(user: User) -> impl actix_web::Responder {
+    format!("Hello there {}", user.id)
 }
 
 #[cfg(feature = "ssr")]
