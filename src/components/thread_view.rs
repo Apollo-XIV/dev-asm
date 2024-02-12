@@ -15,7 +15,11 @@ pub fn Thread(#[prop(into)] data: thread::Thread) -> impl IntoView {
                     utils::time_since(data.date),
                 )
             >
-                <a href=format!("/forum/{}", data.id) class="text-lg font-bold hover:underline">
+
+                <a
+                    href=format!("/forum/{}", data.id)
+                    class="text-lg font-bold hover:underline"
+                >
                     {data.title}
                 </a>
             </Panel>

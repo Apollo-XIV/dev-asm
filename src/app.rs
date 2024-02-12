@@ -115,9 +115,11 @@ fn RecentThreads() -> impl IntoView {
                         {count}
                     </div>
                     <p>
+
                         {
                             move || pending().then(|| "Test");
                         }
+
                     </p>
                     <For each=unwrapped key=|state| state.id let:child>
                         <p>{child.name}</p>
@@ -127,6 +129,7 @@ fn RecentThreads() -> impl IntoView {
                             Some(test) => test.unwrap().first().unwrap().clone().name,
                             None => "none".to_string(),
                         }}
+
                     </p>
                 </ActionForm>
                 <Todo class="h-64"/>

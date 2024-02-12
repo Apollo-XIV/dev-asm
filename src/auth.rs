@@ -149,6 +149,7 @@ async fn user_info(token: String) -> Result<String, &'static str> {
         .map_err(|_| "Bad Response")
 }
 
+#[derive(Clone, Copy)]
 pub struct JwtAuth {
     pub user_id: uuid::Uuid,
 }

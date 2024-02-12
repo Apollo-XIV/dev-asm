@@ -1,4 +1,5 @@
 use cfg_if::cfg_if;
+use leptos_actix::handle_server_fns_with_context;
 use serde::{Deserialize, Serialize};
 
 // #[cfg(feature = "ssr")]
@@ -22,6 +23,7 @@ cfg_if! {
     use actix_web::web::{get, post};
     use finite_humour::app::*;
     use finite_humour::state::AppState;
+    use finite_humour::auth::JwtAuth;
     use finite_humour::AUTH_SECRET;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
@@ -29,15 +31,15 @@ cfg_if! {
 async fn server_fn_handler(
     path: Path<String>,
     // headers: HeaderMap,
-    raw_query: RawQuery,
+    // raw_query: RawQuery,
     token: finite_humour::auth::JwtAuth,
     request: HttpRequest
-) -> impl Responder {
+) -> Route {
     use leptos::provide_context;
     use leptos_actix::handle_server_fns_with_context;
-    handle_server_fns_with_context(path,  raw_query, move |_| {
+    handle_server_fns_with_context(move || {
         provide_context(token.clone())
-    }, request)
+    })
 }
 
 #[actix_web::main]
@@ -63,9 +65,10 @@ async fn main() -> std::io::Result<()> {
         let site_root = &leptos_options.site_root;
 
         App::new()
-            .route(
-                "/api/{tail:.*}", get().to(server_fn_handler).route(post().to(server_fn_handler))
-            )
+            .route("/api/{tail:.*}", handle_server_fns_with_context(||{
+                    let token = dbg!(use_context::<HttpRequest>().map(|ok| ok.cookie("auth_token")));
+                    provide_context(token);
+                }))
             // serve JS/WASM/CSS from `pkg`
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
             // serve other assets from the `assets` directory
@@ -75,7 +78,10 @@ async fn main() -> std::io::Result<()> {
             .leptos_routes_with_context(
                 leptos_options.to_owned(),
                 routes.to_owned(),
-                || provide_context("testData"),
+                || {
+                        let token = use_context::<HttpRequest>().map(|ok| ok.cookie("auth_token"));
+                        provide_context(token.clone())
+                    },
                 App,
             )
             .app_data(web::Data::new(leptos_options.to_owned()))

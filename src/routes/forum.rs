@@ -16,7 +16,8 @@ pub fn Page() -> impl IntoView {
                             .iter()
                             .map(|thread: &thread::Thread| {
                                 view! {
-                                    <thread_view::Thread data=thread.clone()></thread_view::Thread>
+                                    <thread_view::Thread data=thread
+                                        .clone()></thread_view::Thread>
                                 }
                             })
                             .collect_view()

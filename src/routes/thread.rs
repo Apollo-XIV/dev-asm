@@ -31,7 +31,8 @@ pub fn Page() -> impl IntoView {
                         .map(move |x| {
                             x.map(move |thread| {
                                 view! {
-                                    <thread_view::Header data=thread.clone()></thread_view::Header>
+                                    <thread_view::Header data=thread
+                                        .clone()></thread_view::Header>
                                     <comment_view::Thread
                                         id=thread.clone().id
                                         refetch=refresh

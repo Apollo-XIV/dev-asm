@@ -11,23 +11,38 @@ pub fn Page() -> impl IntoView {
     let grab_jwt = create_server_action::<GrabJwt>();
     let session = use_context::<AuthState>();
     view! {
-        <Suspense fallback=||()>
-            <ErrorBoundary fallback=|_err| view!{<p>"Error"</p>} >
-                {move|| client_id.get().map(move|result| result.map(move|ok| view!{
-                    <h1 class="text-xl font-bold text-white">"test page"</h1>
-                    <Panel title="sign in test">
-                        <a href=move||format!("https://github.com/login/oauth/authorize?client_id={}", ok)>
-                            "Sign in with github"
-                        </a>
-                    </Panel>
-                }))}
-                    <Panel title="cookie test">
-                        <button on:click=move|_|grab_jwt.dispatch(GrabJwt{}) >"gimmie a cookie"</button>
-                    </Panel>
-                    <Panel title="fetch cookie test">
-                        <button on:click=move|_|() >"test my cookie"</button>
-                    </Panel>
-                // <p>"logged in as:"{move || session.map(|rsc| rsc.name())}</p>
+        <Suspense fallback=|| ()>
+            <ErrorBoundary fallback=|_err| {
+                view! { <p>"Error"</p> }
+            }>
+                {move || {
+                    client_id
+                        .get()
+                        .map(move |result| {
+                            result
+                                .map(move |ok| {
+                                    view! {
+                                        <h1 class="text-xl font-bold text-white">"test page"</h1>
+                                        <Panel title="sign in test">
+                                            <a href=move || {
+                                                format!(
+                                                    "https://github.com/login/oauth/authorize?client_id={}",
+                                                    ok,
+                                                )
+                                            }>"Sign in with github"</a>
+                                        </Panel>
+                                    }
+                                })
+                        })
+                }}
+                <Panel title="cookie test">
+                    <button on:click=move |_| {
+                        grab_jwt.dispatch(GrabJwt {})
+                    }>"gimmie a cookie"</button>
+                </Panel> <Panel title="fetch cookie test">
+                    <button on:click=move |_| ()>"test my cookie"</button>
+                </Panel>
+            // <p>"logged in as:"{move || session.map(|rsc| rsc.name())}</p>
             </ErrorBoundary>
         </Suspense>
     }

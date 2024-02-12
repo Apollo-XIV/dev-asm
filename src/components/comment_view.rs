@@ -10,7 +10,11 @@ pub fn Panel(data: comment::Comment) -> impl IntoView {
         <div>
             <PanelTemplate
                 title=data.author
-                caption=format!("{} | {} ago", data.date.format("%d/%m/%y"), time_since(data.date))
+                caption=format!(
+                    "{} | {} ago",
+                    data.date.format("%d/%m/%y"),
+                    time_since(data.date),
+                )
             >
                 <p>{data.message}</p>
             </PanelTemplate>
@@ -39,7 +43,8 @@ pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
                         post_comment.version().get();
                         ""
                     }
-                ></textarea>
+                >
+                </textarea>
                 <button
                     type="submit"
                     class="w-full max-w-24 text-blue-950 float-right bg-amber-300 h-8 rounded-sm"
@@ -84,7 +89,10 @@ pub fn Thread(id: i32, refetch: ReadSignal<bool>) -> impl IntoView {
                 {move || {
                     comments()
                         .and_then(|resulted| Some(
-                            resulted.and_then(|comments| Ok(view! { <ThreadView data=comments/> })),
+                            resulted
+                                .and_then(|comments| Ok(
+                                    view! { <ThreadView data=comments/> },
+                                )),
                         ))
                 }}
 
@@ -97,7 +105,11 @@ pub fn Thread(id: i32, refetch: ReadSignal<bool>) -> impl IntoView {
 fn ThreadView(data: Vec<comment::Comment>) -> impl IntoView {
     view! {
         <div class="flex flex-col w-full gap-2">
-            {data.iter().cloned().map(|comment| view! { <Panel data=comment/> }).collect_view()}
+            {data
+                .iter()
+                .cloned()
+                .map(|comment| view! { <Panel data=comment/> })
+                .collect_view()}
         </div>
     }
 }
