@@ -8,8 +8,7 @@ use serde::{Deserialize, Serialize};
 #[component]
 pub fn Page() -> impl IntoView {
     let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
-    let grab_cookie = create_server_action::<GrabCookie>();
-    let test_cookie = create_server_action::<TestCookie>();
+    let grab_jwt = create_server_action::<GrabJwt>();
     let session = use_context::<AuthState>();
     view! {
         <Suspense fallback=||()>
@@ -23,10 +22,10 @@ pub fn Page() -> impl IntoView {
                     </Panel>
                 }))}
                     <Panel title="cookie test">
-                        <button on:click=move|_|grab_cookie.dispatch(GrabCookie{}) >"gimmie a cookie"</button>
+                        <button on:click=move|_|grab_jwt.dispatch(GrabJwt{}) >"gimmie a cookie"</button>
                     </Panel>
                     <Panel title="fetch cookie test">
-                        <button on:click=move|_|test_cookie.dispatch(TestCookie{}) >"test my cookie"</button>
+                        <button on:click=move|_|() >"test my cookie"</button>
                     </Panel>
                 // <p>"logged in as:"{move || session.map(|rsc| rsc.name())}</p>
             </ErrorBoundary>
@@ -34,20 +33,19 @@ pub fn Page() -> impl IntoView {
     }
 }
 
-#[server(TestCookie)]
-async fn test_cookie() -> Result<(), ServerFnError> {
-    use actix_session::Session;
-    use leptos_actix::extract;
-    let _cookie = extract(|session: Session| async move { dbg!(session.entries().to_owned()) })
-        .await
-        .map_err(|_| ServerFnError::ServerError("No Auth Cookie :()".into()))?;
-    Ok(())
-    // .then(|code| async move { exchange_code(code.unwrap_or("BAD".to_string())).await })
-}
+// #[server(TestCookie)]
+// async fn test_cookie() -> Result<(), ServerFnError> {
+//     use actix_session::Session;
+//     use leptos_actix::extract;
+//     let _cookie = extract(|session: Session| async move { dbg!(session.entries().to_owned()) })
+//         .await
+//         .map_err(|_| ServerFnError::ServerError("No Auth Cookie :()".into()))?;
+//     Ok(())
+//     // .then(|code| async move { exchange_code(code.unwrap_or("BAD".to_string())).await })
+// }
 
-#[server(GrabCookie)]
-async fn grab_cookie() -> Result<(), ServerFnError> {
-    use actix_session::Session;
+#[server(GrabJwt)]
+async fn grab_jwt() -> Result<(), ServerFnError> {
     use actix_web::{
         cookie::{Cookie, SameSite},
         http::header,
@@ -56,18 +54,19 @@ async fn grab_cookie() -> Result<(), ServerFnError> {
     };
     use leptos_actix::extract;
     let _cookie =
-        extract(|session: Session| async move { dbg!(session.insert("auth_token", "value")) })
+        extract(|req: HttpRequest | async move { dbg!(req.cookie("auth_token").to_owned()) })
             .await
             .map_err(|_| ServerFnError::ServerError("No Auth Cookie :()".into()))?;
-    // use leptos_actix::ResponseOptions;
-    // let response = expect_context::<ResponseOptions>();
-    // let mut cookie = Cookie::build("auth_token", "Demo Value")
-    //     // .same_site(SameSite::Strict)
-    //     // .secure(true)
-    //     // .http_only(true)
-    //     .finish()
-    //     .to_string();
-    // response.insert_header(header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+    use leptos_actix::ResponseOptions;
+    let response = expect_context::<ResponseOptions>();
+    let cookie = Cookie::build("auth_token", "Demo Value")
+        .path("/")
+        .same_site(SameSite::Lax)
+        // .secure(true)
+        .http_only(true)
+        .finish()
+        .to_string();
+    response.insert_header(header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
     Ok(())
 }
 

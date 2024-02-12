@@ -1,26 +1,47 @@
+use cfg_if::cfg_if;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "ssr")]
-#[derive(Serialize, Deserialize, Clone, Debug, actix_jwt_auth_middleware::FromRequest)]
-struct User {
-    id: u32,
-}
-
-#[cfg(feature = "ssr")]
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+// #[cfg(feature = "ssr")]
+// #[derive(Serialize, Deserialize, Clone, Debug)]
+// struct User {
+//     id: u32,
+// }
+cfg_if! {
+    if #[cfg(feature="ssr")] {
+// #[cfg(feature = "ssr")]
     use actix_files::Files;
-    use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
-    use actix_session::storage::CookieSessionStore;
-    use actix_session::SessionMiddleware;
+    // use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
+    // use actix_session::storage::CookieSessionStore;
+    // use actix_session::SessionMiddleware;
     use actix_web::cookie::Key;
     use actix_web::HttpRequest;
+    use actix_web::web::Path;
+    use actix_web::http::header::HeaderMap;
+    use actix_web::HttpResponse;
     use actix_web::*;
+    use actix_web::web::{get, post};
     use finite_humour::app::*;
     use finite_humour::state::AppState;
     use finite_humour::AUTH_SECRET;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
+
+async fn server_fn_handler(
+    path: Path<String>,
+    // headers: HeaderMap,
+    raw_query: RawQuery,
+    token: finite_humour::auth::JwtAuth,
+    request: HttpRequest
+) -> impl Responder {
+    use leptos::provide_context;
+    use leptos_actix::handle_server_fns_with_context;
+    handle_server_fns_with_context(path,  raw_query, move |_| {
+        provide_context(token.clone())
+    }, request)
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
 
     dotenv::dotenv().ok();
     let conf = get_configuration(None).await.unwrap();
@@ -36,33 +57,14 @@ async fn main() -> std::io::Result<()> {
     let app_state = AppState {
         leptos_options: leptos_options.clone(),
     };
-    use actix_jwt_auth_middleware::{Authority, TokenSigner};
-    use exonum_crypto::{KeyPair, Seed};
-    use jwt_compact::alg::Ed25519;
-    use jwt_compact::prelude::*;
-
-    let key_pair = KeyPair::from_seed(&Seed::from_slice(AUTH_SECRET.as_bytes()).unwrap());
 
     HttpServer::new(move || {
         // let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;
-        let authority = Authority::<User, Ed25519, _, _>::new()
-            .refresh_authorizer(|| async move { Ok(()) })
-            .token_signer(Some(
-                TokenSigner::new()
-                    .signing_key(key_pair.secret_key().clone())
-                    .algorithm(Ed25519)
-                    .build()
-                    .expect("failed"),
-            ))
-            .verifying_key(key_pair.public_key())
-            .build()
-            .expect("");
 
         App::new()
             .route(
-                "/api/{tail:.*}",
-                leptos_actix::handle_server_fns_with_context(|| provide_context("testData")),
+                "/api/{tail:.*}", get().to(server_fn_handler).route(post().to(server_fn_handler))
             )
             // serve JS/WASM/CSS from `pkg`
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
@@ -92,12 +94,12 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-#[cfg(feature = "ssr")]
-#[actix_web::get("/hello")]
-async fn hello(user: User) -> impl actix_web::Responder {
-    format!("Hello there {}", user.id)
-}
+}}
+// #[cfg(feature = "ssr")]
+// #[actix_web::get("/hello")]
+// async fn hello(user: User) -> impl actix_web::Responder {
+//     format!("Hello there {}", user.id)
+// }
 
 #[cfg(feature = "ssr")]
 #[actix_web::get("favicon.ico")]
