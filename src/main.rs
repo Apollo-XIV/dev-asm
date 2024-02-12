@@ -39,26 +39,25 @@ async fn main() -> std::io::Result<()> {
     use actix_jwt_auth_middleware::{Authority, TokenSigner};
     use exonum_crypto::{KeyPair, Seed};
     use jwt_compact::alg::Ed25519;
-    use jwt_compact::Algorithm;
+    use jwt_compact::prelude::*;
 
     let key_pair = KeyPair::from_seed(&Seed::from_slice(AUTH_SECRET.as_bytes()).unwrap());
-
-    let authority = Authority::<User, Ed25519, _, _>::new()
-        .refresh_authorizer(|| async move { Ok(()) })
-        .token_signer(Some(
-            TokenSigner::new()
-                .signing_key(key_pair.secret_key().clone())
-                .algorithm(Ed25519)
-                .build()
-                .expect("failed"),
-        ))
-        .verifying_key(key_pair.public_key())
-        .build()
-        .expect("");
 
     HttpServer::new(move || {
         // let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;
+        let authority = Authority::<User, Ed25519, _, _>::new()
+            .refresh_authorizer(|| async move { Ok(()) })
+            .token_signer(Some(
+                TokenSigner::new()
+                    .signing_key(key_pair.secret_key().clone())
+                    .algorithm(Ed25519)
+                    .build()
+                    .expect("failed"),
+            ))
+            .verifying_key(key_pair.public_key())
+            .build()
+            .expect("");
 
         App::new()
             .route(
@@ -78,7 +77,7 @@ async fn main() -> std::io::Result<()> {
                 App,
             )
             .app_data(web::Data::new(leptos_options.to_owned()))
-            .use_jwt(authority, web::scope("/hello").service(hello))
+        // .use_jwt(authority, web::scope("/hello").service(hello))
         // .wrap(
         //     SessionMiddleware::builder(
         //         CookieSessionStore::default(),

@@ -70,3 +70,19 @@ async fn grab_cookie() -> Result<(), ServerFnError> {
     // response.insert_header(header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
     Ok(())
 }
+
+#[server(TestJwt, "/api", "Url", "test")]
+async fn test_jwt() -> Result<String, ServerFnError> {
+    use crate::auth::JwtAuth;
+    use leptos_actix::extract;
+    let _jwt = extract(|token: JwtAuth| async move {dbg!(token.user_id)} )
+        .await
+        .map_err(|_| ServerFnError::ServerError("Bad Req.".into()))?;
+    Ok("It worked".into())
+}
+
+#[server(GetJwt, "/api", "Url", "get_jwt")]
+async fn get_jwt() -> Result<String, ServerFnError> {
+    use crate::auth::Claims;
+    Ok(Claims::new("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8".into(), "demo".into()))
+}

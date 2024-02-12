@@ -31,7 +31,7 @@ impl Claims {
     }
 
     // mints a new token with expiry set for 30 days
-    fn new(id: i32, ua_token: String) -> String {
+    pub fn new(id: String, ua_token: String) -> String {
         use crate::AUTH_SECRET;
         let iat: usize = Utc::now().timestamp().try_into().unwrap();
         let exp: usize = Utc::now()
@@ -41,7 +41,7 @@ impl Claims {
             .try_into()
             .unwrap();
         let claims = Claims {
-            sub: id.to_string(), // user id
+            sub: id, // user id
             iat,
             exp,
             ua_token,
@@ -147,4 +147,62 @@ async fn user_info(token: String) -> Result<String, &'static str> {
         .text()
         .await
         .map_err(|_| "Bad Response")
+}
+
+pub struct JwtAuth {
+    pub user_id: uuid::Uuid,
+}
+
+#[derive(Debug, Serialize)]
+struct ErrorResponse {
+    status: String,
+    message: String,
+}
+use std::fmt;
+
+impl fmt::Display for ErrorResponse {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", serde_json::to_string(&self).unwrap())
+    }
+}
+
+impl FromRequest for JwtAuth {
+    type Error = ActixWebError;
+    type Future = Ready<Result<Self, Self::Error>>;
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        // let data = req.app_data::<web::Data<AppState>>().expect()();
+
+        let token = req
+            .cookie("token")
+            .map(|c| c.value().to_string())
+            .or_else(|| {
+                req.headers()
+                    .get(http::header::AUTHORIZATION)
+                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
+            });
+
+        if token.is_none() {
+            let json_error = ErrorResponse {
+                status: "fail".to_string(),
+                message: "You are not logged in, please provide a token".to_string(),
+            };
+            return ready(Err(ErrorUnauthorized(json_error)));
+        };
+
+        let claims = match Claims::decode(token.unwrap()) {
+            Ok(x) => x.claims,
+            Err(x) => {
+                let json_error = ErrorResponse {
+                    status: "fail".to_string(),
+                    message: "You are not logged in, please provide a token".to_string(),
+                };
+                return ready(Err(ErrorUnauthorized(json_error)));
+            }
+        };
+        log!("{:?}", claims);
+        let user_id = uuid::Uuid::parse_str(claims.sub.as_str()).unwrap();
+        req.extensions_mut()
+            .insert::<uuid::Uuid>(user_id.to_owned());
+        ready(Ok(JwtAuth { user_id }))
+    }
 }

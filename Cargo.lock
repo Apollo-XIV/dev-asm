@@ -115,7 +115,7 @@ dependencies = [
  "chrono",
  "derive_builder",
  "form_urlencoded",
- "jwt-compact 0.7.0",
+ "jwt-compact",
  "serde",
 ]
 
@@ -1294,7 +1294,7 @@ dependencies = [
  "http",
  "itertools",
  "jsonwebtoken",
- "jwt-compact 0.8.0",
+ "jwt-compact",
  "lazy_static",
  "leptos",
  "leptos_actix",
@@ -1305,6 +1305,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
+ "uuid",
  "wasm-bindgen",
 ]
 
@@ -1897,31 +1898,11 @@ dependencies = [
  "anyhow",
  "base64ct",
  "chrono",
- "hmac",
- "rand_core",
- "serde",
- "serde_cbor",
- "serde_json",
- "sha2",
- "smallvec",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "jwt-compact"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25cb2458ca54de48ef237ac0d68d4e80e512ae81d6aeb9775f4c835da0d193d3"
-dependencies = [
- "anyhow",
- "base64ct",
- "chrono",
- "ciborium",
  "exonum-crypto",
  "hmac",
  "rand_core",
  "serde",
+ "serde_cbor",
  "serde_json",
  "sha2",
  "smallvec",
