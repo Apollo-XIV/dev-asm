@@ -1,5 +1,4 @@
 use cfg_if::cfg_if;
-use leptos_actix::handle_server_fns_with_context;
 use serde::{Deserialize, Serialize};
 
 // #[cfg(feature = "ssr")]
@@ -11,95 +10,83 @@ cfg_if! {
     if #[cfg(feature="ssr")] {
 // #[cfg(feature = "ssr")]
     use actix_files::Files;
-    // use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
-    // use actix_session::storage::CookieSessionStore;
-    // use actix_session::SessionMiddleware;
-    use actix_web::cookie::Key;
     use actix_web::HttpRequest;
-    use actix_web::web::Path;
-    use actix_web::http::header::HeaderMap;
     use actix_web::HttpResponse;
     use actix_web::*;
-    use actix_web::web::{get, post};
     use finite_humour::app::*;
-    use finite_humour::state::AppState;
-    use finite_humour::auth::JwtAuth;
-    use finite_humour::AUTH_SECRET;
+    use finite_humour::state::{AppState, AuthState};
+    use finite_humour::state::JwtAuth;
     use leptos::*;
-    use leptos_actix::{generate_route_list, LeptosRoutes};
+    use leptos_actix::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
+    use leptos::logging::log;
 
-async fn server_fn_handler(
-    path: Path<String>,
-    // headers: HeaderMap,
-    // raw_query: RawQuery,
-    token: finite_humour::auth::JwtAuth,
-    request: HttpRequest
-) -> Route {
-    use leptos::provide_context;
-    use leptos_actix::handle_server_fns_with_context;
-    handle_server_fns_with_context(move || {
-        provide_context(token.clone())
-    })
-}
+    async fn handler(req: HttpRequest, flag: actix_web::web::ReqData<JwtAuth>) -> impl Responder {
+            // leptos_actix::handle_server_fns_with_context(|| {
+            //     "test"
+            // })
+            "test"
+        }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
 
-    dotenv::dotenv().ok();
-    let conf = get_configuration(None).await.unwrap();
-    finite_humour::database::init_db()
+    #[actix_web::main]
+    async fn main() -> std::io::Result<()> {
+
+        dotenv::dotenv().ok();
+        let conf = get_configuration(None).await.unwrap();
+        finite_humour::database::init_db()
+            .await
+            .expect("problem connecting to db");
+        let addr = conf.leptos_options.site_addr;
+        // Generate the list of routes in your Leptos App
+        let leptos_options = conf.leptos_options;
+        let routes = generate_route_list(App);
+        println!("listening on http://{}", &addr);
+
+        let app_state = AppState {
+            leptos_options: leptos_options.clone(),
+        };
+
+        HttpServer::new(move || {
+            // let leptos_options = &conf.leptos_options;
+            let site_root = &leptos_options.site_root;
+
+            App::new()
+                .route("/api/{tail:.*}",handler)
+                    //  handle_server_fns_with_context(||{
+                    //     let token = dbg!(use_context::<HttpRequest>()).map(|ok| ok.cookie("auth_token"));
+                    //     provide_context(token);
+                    // }))
+                // serve JS/WASM/CSS from `pkg`
+                .service(Files::new("/pkg", format!("{site_root}/pkg")))
+                // serve other assets from the `assets` directory
+                .service(Files::new("/assets", site_root))
+                // serve the favicon from /favicon.ico
+                .service(favicon)
+                .leptos_routes_with_context(
+                    leptos_options.to_owned(),
+                    routes.to_owned(),
+                    || {
+                            let token = dbg!(use_context::<HttpRequest>()).map(|ok| ok.cookie("auth_token"));
+                            provide_context(AuthState { user: "test".into()})
+                        },
+                    App,
+                )
+                .app_data(web::Data::new(leptos_options.to_owned()))
+            // .use_jwt(authority, web::scope("/hello").service(hello))
+            // .wrap(
+            //     SessionMiddleware::builder(
+            //         CookieSessionStore::default(),
+            //         Key::from(AUTH_SECRET.as_bytes()),
+            //     )
+            //     .cookie_secure(false)
+            //     .build(),
+            // )
+            //.wrap(middleware::Compress::default())
+        })
+        .bind(&addr)?
+        .run()
         .await
-        .expect("problem connecting to db");
-    let addr = conf.leptos_options.site_addr;
-    // Generate the list of routes in your Leptos App
-    let leptos_options = conf.leptos_options;
-    let routes = generate_route_list(App);
-    println!("listening on http://{}", &addr);
-
-    let app_state = AppState {
-        leptos_options: leptos_options.clone(),
-    };
-
-    HttpServer::new(move || {
-        // let leptos_options = &conf.leptos_options;
-        let site_root = &leptos_options.site_root;
-
-        App::new()
-            .route("/api/{tail:.*}", handle_server_fns_with_context(||{
-                    let token = dbg!(use_context::<HttpRequest>().map(|ok| ok.cookie("auth_token")));
-                    provide_context(token);
-                }))
-            // serve JS/WASM/CSS from `pkg`
-            .service(Files::new("/pkg", format!("{site_root}/pkg")))
-            // serve other assets from the `assets` directory
-            .service(Files::new("/assets", site_root))
-            // serve the favicon from /favicon.ico
-            .service(favicon)
-            .leptos_routes_with_context(
-                leptos_options.to_owned(),
-                routes.to_owned(),
-                || {
-                        let token = use_context::<HttpRequest>().map(|ok| ok.cookie("auth_token"));
-                        provide_context(token.clone())
-                    },
-                App,
-            )
-            .app_data(web::Data::new(leptos_options.to_owned()))
-        // .use_jwt(authority, web::scope("/hello").service(hello))
-        // .wrap(
-        //     SessionMiddleware::builder(
-        //         CookieSessionStore::default(),
-        //         Key::from(AUTH_SECRET.as_bytes()),
-        //     )
-        //     .cookie_secure(false)
-        //     .build(),
-        // )
-        //.wrap(middleware::Compress::default())
-    })
-    .bind(&addr)?
-    .run()
-    .await
-}
+    }
 }}
 // #[cfg(feature = "ssr")]
 // #[actix_web::get("/hello")]

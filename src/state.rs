@@ -24,12 +24,12 @@ pub async fn try_auth() -> Result<AuthState, ServerFnError> {
     // log!("I'm running!!!!");
     use chrono::DateTime;
     use leptos_actix::ResponseOptions;
-    let req = dbg!(expect_context::<HttpRequest>())
+    let req = expect_context::<HttpRequest>()
         .cookie("auth_token")
         .ok_or_else(|| ServerFnError::ServerError("Could not find auth token".into()))?
         .value()
         .to_owned();
-    log!("a val {req:?}");
+    log!("found cookie: {req:?}");
     Ok(AuthState {
         user: "test".to_string(),
     })
@@ -37,5 +37,9 @@ pub async fn try_auth() -> Result<AuthState, ServerFnError> {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AuthState {
-    user: String,
+    pub user: String,
+}
+#[derive(Debug, Clone, Copy)]
+pub struct JwtAuth {
+    pub user_id: uuid::Uuid,
 }

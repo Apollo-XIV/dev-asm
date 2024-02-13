@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub fn Page() -> impl IntoView {
     let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
     let grab_jwt = create_server_action::<GrabJwt>();
-    let session = use_context::<AuthState>();
+    let session = dbg!(use_context::<crate::state::JwtAuth>());
     view! {
         <Suspense fallback=|| ()>
             <ErrorBoundary fallback=|_err| {
@@ -69,7 +69,7 @@ async fn grab_jwt() -> Result<(), ServerFnError> {
     };
     use leptos_actix::extract;
     let _cookie =
-        extract(|req: HttpRequest | async move { dbg!(req.cookie("auth_token").to_owned()) })
+        extract(|req: HttpRequest| async move { dbg!(req.cookie("auth_token").to_owned()) })
             .await
             .map_err(|_| ServerFnError::ServerError("No Auth Cookie :()".into()))?;
     use leptos_actix::ResponseOptions;
@@ -87,9 +87,9 @@ async fn grab_jwt() -> Result<(), ServerFnError> {
 
 #[server(TestJwt, "/api", "Url", "test")]
 async fn test_jwt() -> Result<String, ServerFnError> {
-    use crate::auth::JwtAuth;
+    use crate::state::JwtAuth;
     use leptos_actix::extract;
-    let _jwt = extract(|token: JwtAuth| async move {dbg!(token.user_id)} )
+    let _jwt = extract(|token: JwtAuth| async move { dbg!(token.user_id) })
         .await
         .map_err(|_| ServerFnError::ServerError("Bad Req.".into()))?;
     Ok("It worked".into())
@@ -98,5 +98,8 @@ async fn test_jwt() -> Result<String, ServerFnError> {
 #[server(GetJwt, "/api", "Url", "get_jwt")]
 async fn get_jwt() -> Result<String, ServerFnError> {
     use crate::auth::Claims;
-    Ok(Claims::new("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8".into(), "demo".into()))
+    Ok(Claims::new(
+        "a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8".into(),
+        "demo".into(),
+    ))
 }

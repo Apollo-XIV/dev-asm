@@ -29,6 +29,7 @@ itertools = "0.12.1"
 serde_json = "1.0.113"
 jsonwebtoken = "9.2.0"
 uuid = { version = "1.7.0", features = ["v4"] }
+tokio = { version = "1.36.0", optional = true, features = ["rt-multi-thread"] }
 
 
 [dependencies.cookie]
@@ -45,6 +46,7 @@ ssr = [
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
+  "dep:tokio",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

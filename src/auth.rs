@@ -149,11 +149,6 @@ async fn user_info(token: String) -> Result<String, &'static str> {
         .map_err(|_| "Bad Response")
 }
 
-#[derive(Clone, Copy)]
-pub struct JwtAuth {
-    pub user_id: uuid::Uuid,
-}
-
 #[derive(Debug, Serialize)]
 struct ErrorResponse {
     status: String,
@@ -167,7 +162,7 @@ impl fmt::Display for ErrorResponse {
     }
 }
 
-impl FromRequest for JwtAuth {
+impl FromRequest for crate::state::JwtAuth {
     type Error = ActixWebError;
     type Future = Ready<Result<Self, Self::Error>>;
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
@@ -204,6 +199,6 @@ impl FromRequest for JwtAuth {
         let user_id = uuid::Uuid::parse_str(claims.sub.as_str()).unwrap();
         req.extensions_mut()
             .insert::<uuid::Uuid>(user_id.to_owned());
-        ready(Ok(JwtAuth { user_id }))
+        ready(Ok(crate::state::JwtAuth { user_id }))
     }
 }
