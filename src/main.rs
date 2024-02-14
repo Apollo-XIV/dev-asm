@@ -20,11 +20,11 @@ cfg_if! {
     use leptos_actix::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
     use leptos::logging::log;
 
-    async fn handler(req: HttpRequest, flag: actix_web::web::ReqData<JwtAuth>) -> impl Responder {
-            // leptos_actix::handle_server_fns_with_context(|| {
-            //     "test"
-            // })
-            "test"
+    fn handler() -> Route {
+            leptos_actix::handle_server_fns_with_context(|| {
+                provide_context("test")
+            })
+            // "test"
         }
 
 
@@ -51,7 +51,7 @@ cfg_if! {
             let site_root = &leptos_options.site_root;
 
             App::new()
-                .route("/api/{tail:.*}",handler)
+                .route("/api/{tail:.*}",handler())
                     //  handle_server_fns_with_context(||{
                     //     let token = dbg!(use_context::<HttpRequest>()).map(|ok| ok.cookie("auth_token"));
                     //     provide_context(token);

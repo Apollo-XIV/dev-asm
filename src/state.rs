@@ -30,9 +30,7 @@ pub async fn try_auth() -> Result<AuthState, ServerFnError> {
         .value()
         .to_owned();
     log!("found cookie: {req:?}");
-    Ok(AuthState {
-        user: "test".to_string(),
-    })
+    Ok(AuthState { user: req })
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -42,4 +40,19 @@ pub struct AuthState {
 #[derive(Debug, Clone, Copy)]
 pub struct JwtAuth {
     pub user_id: uuid::Uuid,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct AuthCtx(pub Signal<Option<crate::state::AuthState>>);
+
+impl AuthCtx {
+    pub fn get(&self) -> Option<AuthState> {
+        self.0.get()
+    }
+}
+
+impl Default for AuthCtx {
+    fn default() -> Self {
+        AuthCtx(Signal::derive(move || None))
+    }
 }

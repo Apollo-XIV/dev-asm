@@ -1,6 +1,7 @@
 use crate::components::{nav::Nav, panel::Panel, todo::Todo};
 use crate::routes::{forum, signup, thread};
 use crate::state::try_auth;
+use crate::state::AuthCtx;
 use futures_util::Future;
 use leptos::*;
 use leptos_meta::*;
@@ -11,15 +12,20 @@ use serde::{Deserialize, Serialize};
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
-    // let session = dbg!(create_blocking_resource(|| (), move |_| { try_auth())it);
+    let session = create_blocking_resource(|| (), move |_| try_auth());
     // .get()
     // .map(|ok| ok.ok())
+    let resolved = Signal::derive(move || match session.get() {
+        Some(Ok(x)) => Some(x),
+        Some(Err(_)) => None,
+        None => None,
+    });
     // .flatten()); // some or none member
-    // provide_context(session);
+    provide_context(AuthCtx(resolved));
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-start.css"/>
         <Stylesheet id="leptos" href="/assets/tailwind.css"/>
-        // <Suspense fallback=||() >{session.get().map(|some| "test")}</Suspense>
+        <Suspense fallback=||() ><title>{session.get().map(|res_val| res_val.map(|auth_state| auth_state.user))}</title></Suspense>
         // sets the document title
         <Title text="Welcome to Leptos"/>
 

@@ -1,4 +1,5 @@
 use crate::components::panel::Panel;
+use crate::state::AuthCtx;
 use crate::state::AuthState;
 use crate::utils;
 use leptos::logging::log;
@@ -9,12 +10,13 @@ use serde::{Deserialize, Serialize};
 pub fn Page() -> impl IntoView {
     let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
     let grab_jwt = create_server_action::<GrabJwt>();
-    let session = dbg!(use_context::<crate::state::JwtAuth>());
+    let session = use_context::<AuthCtx>().unwrap_or_default();
     view! {
         <Suspense fallback=|| ()>
             <ErrorBoundary fallback=|_err| {
                 view! { <p>"Error"</p> }
             }>
+                {move || session.get().map(|val| val.user)}
                 {move || {
                     client_id
                         .get()
