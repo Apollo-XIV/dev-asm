@@ -1,6 +1,8 @@
 -- Creating database tables
 create table if not exists Member (
     id SERIAL PRIMARY KEY,
+    gh_id INTEGER NOT NULL,
+    av_url TEXT,
     username VARCHAR(50) NOT NULL,
     joined TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -24,9 +26,9 @@ create table if not exists Comment (
 );
 
 -- Inserting example records
-insert into Member (username) values
-    ('testUser'),
-    ('testUser2');
+insert into Member (gh_id, username) values
+    (42424242,'testUser'),
+    (42424242,'testUser2');
 
 insert into Thread (title, author_id) values 
     ('How do I Lorem Ipsum while using Dolor Sit Amet', 1),

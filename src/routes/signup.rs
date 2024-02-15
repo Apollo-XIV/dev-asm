@@ -97,11 +97,11 @@ async fn test_jwt() -> Result<String, ServerFnError> {
     Ok("It worked".into())
 }
 
-#[server(GetJwt, "/api", "Url", "get_jwt")]
-async fn get_jwt() -> Result<String, ServerFnError> {
-    use crate::auth::Claims;
-    Ok(Claims::new(
-        "a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8".into(),
-        "demo".into(),
-    ))
-}
+// #[server(GetJwt, "/api", "Url", "get_jwt")]
+// async fn get_jwt() -> Result<String, ServerFnError> {
+//     use crate::auth::Claims;
+//     Ok(Claims::new(
+//         "a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8".into(),
+//         "demo".into(),
+//     ))
+// }
