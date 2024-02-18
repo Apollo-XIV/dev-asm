@@ -14,8 +14,7 @@ cfg_if! {
     use actix_web::HttpResponse;
     use actix_web::*;
     use finite_humour::app::*;
-    use finite_humour::state::{AppState, AuthState};
-    use finite_humour::state::JwtAuth;
+    use finite_humour::state::{AppState,};
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
     use leptos::logging::log;
@@ -62,17 +61,12 @@ cfg_if! {
                 .service(Files::new("/assets", site_root))
                 // serve the favicon from /favicon.ico
                 .service(favicon)
-                .leptos_routes_with_context(
+                .leptos_routes(
                     leptos_options.to_owned(),
                     routes.to_owned(),
-                    || {
-                            let token = dbg!(use_context::<HttpRequest>()).map(|ok| ok.cookie("auth_token"));
-                            provide_context(AuthState { user: "test".into()})
-                        },
                     App,
                 )
                 .app_data(web::Data::new(leptos_options.to_owned()))
-            // .use_jwt(authority, web::scope("/hello").service(hello))
             // .wrap(
             //     SessionMiddleware::builder(
             //         CookieSessionStore::default(),

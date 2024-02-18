@@ -1,6 +1,7 @@
 use chrono::{Duration, Utc};
 use leptos::logging::log;
 use leptos::*;
+use leptos_actix::ResponseOptions;
 use serde::{Deserialize, Serialize};
 use std::future::{ready, Ready};
 
@@ -16,20 +17,20 @@ pub struct Claims {
     sub: String,
     iat: usize,
     exp: usize,
-    user_data: member::Member,
+    pub user_data: member::Member,
     // gh_token: String, // used to access github and check user details
 }
 
 #[cfg(feature = "ssr")]
 impl Claims {
-    fn decode(token: String) -> Result<TokenData<Claims>, &'static str> {
+    pub fn decode(token: String) -> Result<TokenData<Claims>, String> {
         use crate::AUTH_SECRET;
         decode::<Claims>(
             &token,
             &DecodingKey::from_secret(AUTH_SECRET.as_bytes()),
             &Validation::default(),
         )
-        .map_err(|_err| "Could not decode token")
+        .map_err(|_err| "Could not decode token".into())
     }
 
     // mints a new token with expiry set for 30 days
@@ -64,7 +65,7 @@ struct ReqParams {
 
 #[server(SignupCallback, "/api", "GetJson", "callback")]
 pub async fn signup_callback() -> Result<String, ServerFnError> {
-    use actix_web::web::{Data, Query};
+    use actix_web::web::Query;
     use actix_web::{
         cookie::{Cookie, SameSite},
         http::header,
@@ -99,6 +100,24 @@ pub async fn signup_callback() -> Result<String, ServerFnError> {
     // happy days?
     leptos_actix::redirect("/");
     Ok("Registering User".to_string())
+}
+
+#[server(SignOut, "/api", "Url", "signout")]
+pub async fn sign_out() -> Result<(), ServerFnError> {
+    use actix_web::{
+        cookie::{Cookie, SameSite},
+        http::header,
+        http::header::HeaderValue,
+    };
+    let response = expect_context::<ResponseOptions>();
+    let cookie = Cookie::build("auth_token", "")
+        .path("/")
+        .same_site(SameSite::Lax)
+        .http_only(true)
+        .finish()
+        .to_string();
+    response.insert_header(header::SET_COOKIE, HeaderValue::from_str(&cookie)?);
+    Ok(())
 }
 
 #[cfg(feature = "ssr")]
@@ -178,58 +197,4 @@ async fn user_info(token: String) -> Result<(i32, String, String), String> {
                 })
                 .map_err(|_| "Couldn't parse Json data".to_string())
         })
-}
-
-#[derive(Debug, Serialize)]
-struct ErrorResponse {
-    status: String,
-    message: String,
-}
-use std::fmt;
-
-impl fmt::Display for ErrorResponse {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", serde_json::to_string(&self).unwrap())
-    }
-}
-
-impl FromRequest for crate::state::JwtAuth {
-    type Error = ActixWebError;
-    type Future = Ready<Result<Self, Self::Error>>;
-    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        // let data = req.app_data::<web::Data<AppState>>().expect()();
-
-        let token = req
-            .cookie("token")
-            .map(|c| c.value().to_string())
-            .or_else(|| {
-                req.headers()
-                    .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
-            });
-
-        if token.is_none() {
-            let json_error = ErrorResponse {
-                status: "fail".to_string(),
-                message: "You are not logged in, please provide a token".to_string(),
-            };
-            return ready(Err(ErrorUnauthorized(json_error)));
-        };
-
-        let claims = match Claims::decode(token.unwrap()) {
-            Ok(x) => x.claims,
-            Err(x) => {
-                let json_error = ErrorResponse {
-                    status: "fail".to_string(),
-                    message: "You are not logged in, please provide a token".to_string(),
-                };
-                return ready(Err(ErrorUnauthorized(json_error)));
-            }
-        };
-        log!("{:?}", claims);
-        let user_id = uuid::Uuid::parse_str(claims.sub.as_str()).unwrap();
-        req.extensions_mut()
-            .insert::<uuid::Uuid>(user_id.to_owned());
-        ready(Ok(crate::state::JwtAuth { user_id }))
-    }
 }

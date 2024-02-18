@@ -12,20 +12,17 @@ use serde::{Deserialize, Serialize};
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
-    let session = create_blocking_resource(|| (), move |_| try_auth());
+    let session = create_blocking_resource(|| (), move |_| async { dbg!(try_auth().await.ok()) });
     // .get()
     // .map(|ok| ok.ok())
-    let resolved = Signal::derive(move || match session.get() {
-        Some(Ok(x)) => Some(x),
-        Some(Err(_)) => None,
-        None => None,
-    });
-    // .flatten()); // some or none member
-    provide_context(AuthCtx(resolved));
+    provide_context(AuthCtx(session));
+    // if let Some(Ok(ctx)) = session.get() {
+    //     logging::log!("{:?}", ctx);
+    //     provide_context(ctx); // .flatten()); // some or none member
+    // }
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-start.css"/>
         <Stylesheet id="leptos" href="/assets/tailwind.css"/>
-        <Suspense fallback=||() ><title>{session.get().map(|res_val| res_val.map(|auth_state| auth_state.user))}</title></Suspense>
         // sets the document title
         <Title text="Welcome to Leptos"/>
 
@@ -35,14 +32,20 @@ pub fn App() -> impl IntoView {
                 <Nav/>
                 <main class="max-w-3xl max-h-screen overflow-y-scroll overflow-x-hidden h-fit flex flex-wrap justify-center place-items-stretch gap-2 w-full p-2">
                     <Routes>
-                        <Route path="" view=HomePage/>
-                        <Route path="/forum" view=|| view! { <Outlet/> }>
-                            <Route path="/new" view=thread::New/>
-                            <Route path=":id" view=thread::Page/>
-                            <Route path="" view=forum::Page/>
+                        <Route path="" view=|| view! { <Outlet/> } ssr=SsrMode::PartiallyBlocked>
+                            // <Suspense fallback=|| view!{}>
+                            //     {move || session.get().map(|x|x.map(|y| "test"))}
+
+                            // </Suspense>
+                            <Route path="" view=HomePage/>
+                            <Route path="/forum" view=|| view! { <Outlet/> }>
+                                <Route path="/new" view=thread::New/>
+                                <Route path=":id" view=thread::Page/>
+                                <Route path="" view=forum::Page/>
+                            </Route>
+                            <Route path="/signup" view=signup::Page/>
+                            <Route path="/*any" view=NotFound/>
                         </Route>
-                        <Route path="/signup" view=signup::Page/>
-                        <Route path="/*any" view=NotFound/>
                     </Routes>
                 </main>
             </body>

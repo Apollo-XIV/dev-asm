@@ -4,7 +4,7 @@ create table if not exists Member (
     gh_id INTEGER NOT NULL,
     av_url TEXT,
     username VARCHAR(50) NOT NULL,
-    joined TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 create table if not exists Thread (

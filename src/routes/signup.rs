@@ -1,6 +1,6 @@
 use crate::components::panel::Panel;
 use crate::state::AuthCtx;
-use crate::state::AuthState;
+// use crate::state::AuthState;
 use crate::utils;
 use leptos::logging::log;
 use leptos::*;
@@ -10,18 +10,19 @@ use serde::{Deserialize, Serialize};
 pub fn Page() -> impl IntoView {
     let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
     let grab_jwt = create_server_action::<GrabJwt>();
-    let session = use_context::<AuthCtx>().unwrap_or_default();
+    let test_jwt = create_server_action::<TestJwt>();
+    let (session, _) = create_signal(use_context::<AuthCtx>());
     view! {
         <Suspense fallback=|| ()>
             <ErrorBoundary fallback=|_err| {
                 view! { <p>"Error"</p> }
             }>
-                {move || session.get().map(|val| val.user)}
+                <div>
+                // {move || session.get().map(|some| some.username)}
                 {move || {
                     client_id
                         .get()
-                        .map(move |result| {
-                            result
+                        .map(move |result| { result
                                 .map(move |ok| {
                                     view! {
                                         <h1 class="text-xl font-bold text-white">"test page"</h1>
@@ -37,12 +38,13 @@ pub fn Page() -> impl IntoView {
                                 })
                         })
                 }}
+                </div>
                 <Panel title="cookie test">
                     <button on:click=move |_| {
                         grab_jwt.dispatch(GrabJwt {})
                     }>"gimmie a cookie"</button>
                 </Panel> <Panel title="fetch cookie test">
-                    <button on:click=move |_| ()>"test my cookie"</button>
+                    <button on:click=move |_| test_jwt.dispatch(TestJwt {})>"test my cookie"</button>
                 </Panel>
             // <p>"logged in as:"{move || session.map(|rsc| rsc.name())}</p>
             </ErrorBoundary>
@@ -89,11 +91,23 @@ async fn grab_jwt() -> Result<(), ServerFnError> {
 
 #[server(TestJwt, "/api", "Url", "test")]
 async fn test_jwt() -> Result<String, ServerFnError> {
-    use crate::state::JwtAuth;
+    use actix_web::{
+        cookie::{Cookie, SameSite},
+        http::header,
+        http::header::HeaderValue,
+        HttpRequest,
+    };
+    use leptos::ServerFnError::*;
     use leptos_actix::extract;
-    let _jwt = extract(|token: JwtAuth| async move { dbg!(token.user_id) })
+    let token = extract(|req: HttpRequest| async move { req })
         .await
-        .map_err(|_| ServerFnError::ServerError("Bad Req.".into()))?;
+        .and_then(|req| {
+            req.cookie("auth_token")
+                .ok_or(MissingArg("auth_token".into()))
+        })
+        .map(|ck| ck.value().to_string())?;
+    let claims = crate::auth::Claims::decode(token).map_err(Deserialization)?;
+    let _ = dbg!(claims);
     Ok("It worked".into())
 }
 

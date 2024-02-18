@@ -25,18 +25,7 @@ pub fn Nav() -> impl IntoView {
                         </li>
                     </ul>
                 </Panel>
-                <Panel title="Account".to_string()>
-                    <p class="text-sm">"Signed in as:"</p>
-                    <h1 class="text-lg font-semibold">"TestUser"</h1>
-                    <div class="flex justify-between text-sm italic">
-                        <p>"acct. rep"</p>
-                        <p>"acct. age"</p>
-                    </div>
-                    <div class="flex justify-between text-sm underline">
-                        <a href="/account/board">"My Board"</a>
-                        <a href="/sign-out">"Sign Out"</a>
-                    </div>
-                </Panel>
+                <crate::components::member::Active />
             </div>
         </nav>
     }
