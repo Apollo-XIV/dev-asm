@@ -19,8 +19,7 @@ pub fn time_since(dt: DateTime<Utc>) -> String {
     }
 }
 
-#[server]
+#[server(GetClientId, "/api", "Cbor", "get_client_id")]
 pub async fn get_client_id() -> Result<String, ServerFnError> {
-    use crate::CLIENT_ID;
-    Ok(CLIENT_ID.to_owned())
+    Ok(dbg!(crate::CLIENT_ID.to_owned()))
 }

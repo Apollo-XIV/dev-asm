@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 #[component]
 pub fn Page() -> impl IntoView {
-    let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
+    // let client_id = create_blocking_resource(|| (), move |_| utils::get_client_id());
     let grab_jwt = create_server_action::<GrabJwt>();
     let test_jwt = create_server_action::<TestJwt>();
     let (session, _) = create_signal(use_context::<AuthCtx>());
@@ -19,25 +19,25 @@ pub fn Page() -> impl IntoView {
             }>
                 <div>
                 // {move || session.get().map(|some| some.username)}
-                {move || {
-                    client_id
-                        .get()
-                        .map(move |result| { result
-                                .map(move |ok| {
-                                    view! {
-                                        <h1 class="text-xl font-bold text-white">"test page"</h1>
-                                        <Panel title="sign in test">
-                                            <a href=move || {
-                                                format!(
-                                                    "https://github.com/login/oauth/authorize?client_id={}",
-                                                    ok,
-                                                )
-                                            }>"Sign in with github"</a>
-                                        </Panel>
-                                    }
-                                })
-                        })
-                }}
+                // {move || {
+                //     client_id
+                //         .get()
+                //         .map(move |result| { result
+                //                 .map(move |ok| {
+                //                     view! {
+                //                         <h1 class="text-xl font-bold text-white">"test page"</h1>
+                //                         <Panel title="sign in test">
+                //                             <a href=move || {
+                //                                 format!(
+                //                                     "https://github.com/login/oauth/authorize?client_id={}",
+                //                                     ok,
+                //                                 )
+                //                             }>"Sign in with github"</a>
+                //                         </Panel>
+                //                     }
+                //                 })
+                //         })
+                // }}
                 </div>
                 <Panel title="cookie test">
                     <button on:click=move |_| {
