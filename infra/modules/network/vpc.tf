@@ -19,16 +19,16 @@ resource "aws_eip" "nat_gw_eip" {
     Name = "${var.service}-${var.environment}-eip"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_gw_eip.id
   subnet_id     = aws_subnet.public[0].id
-
 }
+
 data "aws_availability_zones" "available" {}
 
 locals {

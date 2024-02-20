@@ -27,9 +27,9 @@ resource "aws_dynamodb_table" "state_locking_table" {
     Name = "${var.service}-${var.environment}-locktable"
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_kms_key" "cmk_dynamo" {

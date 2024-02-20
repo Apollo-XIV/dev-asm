@@ -61,6 +61,7 @@ pub fn App() -> impl IntoView {
                                     }
                                 }
                             />
+
                             <Route
                                 path="/forum"
                                 view=|| {
@@ -71,6 +72,7 @@ pub fn App() -> impl IntoView {
                                     }
                                 }
                             >
+
                                 <Route path="/new" view=thread::New/>
                                 <Route path=":id" view=thread::Page/>
                                 <Route path="" view=forum::Page/>
@@ -85,6 +87,7 @@ pub fn App() -> impl IntoView {
                                     }
                                 }
                             />
+
                             <Route path="/*any" view=NotFound/>
                         </Route>
                     </Routes>
