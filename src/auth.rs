@@ -1,5 +1,6 @@
 use chrono::{Duration, Utc};
 use leptos::logging::log;
+use leptos::ServerFnError::*;
 use leptos::*;
 use leptos_actix::ResponseOptions;
 use serde::{Deserialize, Serialize};
@@ -19,6 +20,14 @@ pub struct Claims {
     exp: usize,
     pub user_data: member::Member,
     // gh_token: String, // used to access github and check user details
+}
+
+pub async fn auth(req: HttpRequest) -> Result<member::Member, ServerFnError> {
+    req.cookie("auth_token")
+        .ok_or(MissingArg("auth_token".into()))
+        .map(|ck| ck.value().to_string())
+        .and_then(|ok| Claims::decode(ok).map_err(Deserialization))
+        .map(|token| token.claims.user_data)
 }
 
 #[cfg(feature = "ssr")]
@@ -137,10 +146,10 @@ async fn exchange_code(code: String) -> Result<String, String> {
         .form(&params)
         .send() // send post req to github/login/oauth/access_token
         .await
-        .map_err(|_err| "Bad response from github. Please contact the administrator".to_string())?
+        .map_err(|err| format!("Bad Response from github:{}", err))? // unprocessed response
         .text() // get response body
         .await
-        .map_err(|_err| "Bad response from github. Please contact the administrator".to_string())?; // url encoded response body
+        .map_err(|err| format!("Bad Response from github:{}", err))?; // url encoded response body
 
     let token = response
         .split('&')

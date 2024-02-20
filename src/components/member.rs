@@ -17,7 +17,7 @@ pub fn Active() -> impl IntoView {
             fallback=||view!{<SignIn />} >
             {auth.get().map(move |some| view!{{move || some.clone().username}})}
             <ActionForm action=sign_out>
-                <input class="cursor-pointer underline" value="sign out" type="submit"/>
+                <input class="cursor-pointer text-sm underline" value="sign out" type="submit"/>
             </ActionForm>
         </Show>
         </panel::Panel>

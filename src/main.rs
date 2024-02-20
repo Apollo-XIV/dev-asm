@@ -13,8 +13,8 @@ cfg_if! {
     use actix_web::HttpRequest;
     use actix_web::HttpResponse;
     use actix_web::*;
-    use finite_humour::app::*;
-    use finite_humour::state::{AppState,};
+    use dev_asm::app::*;
+    use dev_asm::state::{AppState,};
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
     use leptos::logging::log;
@@ -32,7 +32,7 @@ cfg_if! {
 
         dotenv::dotenv().ok();
         let conf = get_configuration(None).await.unwrap();
-        finite_humour::database::init_db()
+        dev_asm::database::init_db()
             .await
             .expect("problem connecting to db");
         let addr = conf.leptos_options.site_addr;
@@ -113,7 +113,7 @@ pub fn main() {
     // a client-side main function is required for using `trunk serve`
     // prefer using `cargo leptos serve` instead
     // to run: `trunk serve --open --features csr`
-    use finite_humour::app::*;
+    use dev_asm::app::*;
     use leptos::*;
     use wasm_bindgen::prelude::wasm_bindgen;
 

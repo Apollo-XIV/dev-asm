@@ -50,20 +50,19 @@ pub async fn get_by_thread_id(id: i32) -> Result<Vec<Comment>, ServerFnError> {
 }
 
 #[server(NewComment)]
-pub async fn new_comment(
-    message: String,
-    author_id: i32,
-    thread_id: i32,
-) -> Result<(), ServerFnError> {
-    println!("{} from {} on {}", message, author_id, thread_id);
+pub async fn new_comment(message: String, thread_id: i32) -> Result<(), ServerFnError> {
+    // println!("{} from {} on {}", message, thread_id);
+    use crate::auth::auth;
     use crate::database::get_db;
+    use crate::models::member::Member;
+    use leptos_actix::extract;
     use sqlx::query;
-    // sleep(Duration::from_secs(10));
+    let user: Member = extract(auth).await??;
     match query!(
         "INSERT INTO comment (message, author_id, thread_id) VALUES
         ($1, $2, $3)",
         message,
-        author_id,
+        user.id,
         thread_id
     )
     .execute(get_db())

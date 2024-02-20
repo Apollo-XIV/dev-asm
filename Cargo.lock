@@ -841,6 +841,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "dev-asm"
+version = "0.1.0"
+dependencies = [
+ "actix-files",
+ "actix-web",
+ "cfg-if",
+ "chrono",
+ "console_error_panic_hook",
+ "dotenv",
+ "futures-util",
+ "http",
+ "itertools",
+ "jsonwebtoken",
+ "lazy_static",
+ "leptos",
+ "leptos_actix",
+ "leptos_meta",
+ "leptos_router",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "uuid",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -926,35 +955,6 @@ name = "fastrand"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25cbce373ec4653f1a01a31e8a5e5ec0c622dc27ff9c4e6606eefef5cbbed4a5"
-
-[[package]]
-name = "finite-humour"
-version = "0.1.0"
-dependencies = [
- "actix-files",
- "actix-web",
- "cfg-if",
- "chrono",
- "console_error_panic_hook",
- "dotenv",
- "futures-util",
- "http",
- "itertools",
- "jsonwebtoken",
- "lazy_static",
- "leptos",
- "leptos_actix",
- "leptos_meta",
- "leptos_router",
- "once_cell",
- "reqwest",
- "serde",
- "serde_json",
- "sqlx",
- "tokio",
- "uuid",
- "wasm-bindgen",
-]
 
 [[package]]
 name = "finl_unicode"

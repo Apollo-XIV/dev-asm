@@ -57,7 +57,6 @@ pub fn New() -> impl IntoView {
     view! {
         <Panel title="Create a new thread" class="w-full">
             <ActionForm action=new_thread>
-                <input type="hidden" name="author_id" value="1"/>
                 <input
                     autocomplete="off"
                     name="title"

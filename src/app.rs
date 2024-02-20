@@ -2,7 +2,6 @@ use crate::components::{nav::Nav, panel::Panel, todo::Todo};
 use crate::routes::{forum, signup, thread};
 use crate::state::try_auth;
 use crate::state::AuthCtx;
-use futures_util::Future;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -12,7 +11,7 @@ use serde::{Deserialize, Serialize};
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
-    let session = create_blocking_resource(|| (), move |_| async { dbg!(try_auth().await.ok()) });
+    // let session = create_blocking_resource(|| (), move |_| async { dbg!(try_auth().await.ok()) });
     // let derived = Signal::derive(move || {
     //     logging::log!("{:?}", session.get().flatten());
     //     session.get().flatten()
@@ -21,6 +20,15 @@ pub fn App() -> impl IntoView {
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-start.css"/>
         <Stylesheet id="leptos" href="/assets/tailwind.css"/>
+
+        // Fira-Mono CDN Link from google-fonts
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+
         // sets the document title
         <Title text="Welcome to Leptos"/>
 
@@ -34,22 +42,49 @@ pub fn App() -> impl IntoView {
                     <Routes>
                         <Route path="" view=|| view! { <Outlet/> } ssr=SsrMode::PartiallyBlocked>
                             // <Suspense fallback=|| view!{}>
-                                // {move || session.get().map(|x|x.map(|y| "test"))}
-                                    // {move || {
-                                    //     let derived = Signal::derive(move || {
-                                    //         logging::log!("logged in as: {:?}", session.get().flatten());
-                                    //         session.get().flatten()
-                                    //     });
-                                    //     provide_context(AuthCtx(derived));
-                                    // }}
+                            // {move || session.get().map(|x|x.map(|y| "test"))}
+                            // {move || {
+                            // let derived = Signal::derive(move || {
+                            // logging::log!("logged in as: {:?}", session.get().flatten());
+                            // session.get().flatten()
+                            // });
+                            // provide_context(AuthCtx(derived));
+                            // }}
                             // </Suspense>
-                            <Route path="" view=|| view!{ <AuthProvider><HomePage /></AuthProvider> }/>
-                            <Route path="/forum" view=|| view! { <AuthProvider><Outlet/></AuthProvider> }>
+                            <Route
+                                path=""
+                                view=|| {
+                                    view! {
+                                        <AuthProvider>
+                                            <HomePage/>
+                                        </AuthProvider>
+                                    }
+                                }
+                            />
+                            <Route
+                                path="/forum"
+                                view=|| {
+                                    view! {
+                                        <AuthProvider>
+                                            <Outlet/>
+                                        </AuthProvider>
+                                    }
+                                }
+                            >
                                 <Route path="/new" view=thread::New/>
                                 <Route path=":id" view=thread::Page/>
                                 <Route path="" view=forum::Page/>
                             </Route>
-                            <Route path="/signup" view=|| view!{<AuthProvider><signup::Page/></AuthProvider>}/>
+                            <Route
+                                path="/signup"
+                                view=|| {
+                                    view! {
+                                        <AuthProvider>
+                                            <signup::Page></signup::Page>
+                                        </AuthProvider>
+                                    }
+                                }
+                            />
                             <Route path="/*any" view=NotFound/>
                         </Route>
                     </Routes>
@@ -63,11 +98,11 @@ pub fn App() -> impl IntoView {
 fn AuthProvider(children: ChildrenFn) -> impl IntoView {
     let session = create_blocking_resource(|| (), move |_| async { try_auth().await.ok() });
     let derived = Signal::derive(move || {
-        logging::log!("logged in as: {:?}", session.get().flatten());
+        // logging::log!("logged in as: {:?}", session.get().flatten());
         session.get().flatten()
     });
     provide_context(AuthCtx(derived));
-    view! {<Suspense fallback=||()>{children()}</Suspense>}
+    view! { <Suspense fallback=|| ()>{children()}</Suspense> }
 }
 
 /// Renders the home page of your application.

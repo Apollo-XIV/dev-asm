@@ -4,6 +4,9 @@ module.exports = {
     files: ["*.html", "./src/**/*.rs"],
   },
   theme: {
+    fontFamily: {
+      'sans': ['Fira Mono', 'ui-monospace', 'SFMono-Regular']
+    },
     extend: {},
   },
   plugins: [],

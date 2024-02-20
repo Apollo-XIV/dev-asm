@@ -1,5 +1,6 @@
 use crate::components::panel::Panel as PanelTemplate;
 use crate::models::comment;
+use crate::state::AuthCtx;
 use crate::utils::time_since;
 use leptos::*;
 use leptos_router::*;
@@ -25,15 +26,19 @@ pub fn Panel(data: comment::Comment) -> impl IntoView {
 #[component]
 pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
     let post_comment = create_server_action::<comment::NewComment>();
+    let user = expect_context::<AuthCtx>();
+    let copy = user.clone(); // todo: find a better solution other than cloning :/
     create_effect(move |_| {
         post_comment.version().get();
         alert.update(|value| *value = !*value);
     });
     view! {
-        <PanelTemplate class="w-full" title=format!("Commenting as {}", 1)>
+        <Show
+            when=move ||copy.get().is_some()
+            fallback=||()>
+        <PanelTemplate class="w-full" title=format!("Commenting as {}", user.get().unwrap().username)>
             <ActionForm action=post_comment>
                 <input type="hidden" name="thread_id" value=source/>
-                <input type="hidden" name="author_id" value="1"/>
                 <textarea
                     name="message"
                     rows=2
@@ -71,6 +76,7 @@ pub fn New(source: i32, alert: WriteSignal<bool>) -> impl IntoView {
             </ActionForm>
 
         </PanelTemplate>
+        </Show>
     }
 }
 
