@@ -11,8 +11,8 @@ resource "aws_network_acl" "public" {
       rule_no    = 100 + ingress.key
       action     = "allow"
       cidr_block = "0.0.0.0/0"
-      from_port  = ingress.value
-      to_port    = ingress.value
+      from_port  = 0
+      to_port    = 1023
     }
   }
 

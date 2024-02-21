@@ -16,9 +16,9 @@ terraform {
 
 
 
-##### LEFT COMMENTED ON PURPOSE => used once to create new state and change locking resources
-module "s3Backend" {
-  source      = "./modules/s3Backend"
-  service     = var.service
-  environment = var.environment
-}
+# ##### LEFT COMMENTED ON PURPOSE => used once to create new state and change locking resources
+# module "s3Backend" {
+#   source      = "./modules/s3Backend"
+#   service     = var.service
+#   environment = var.environment
+# }

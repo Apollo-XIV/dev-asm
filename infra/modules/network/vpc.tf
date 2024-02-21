@@ -36,10 +36,14 @@ locals {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id            = aws_vpc.main.id
-  count             = var.availability_zones
-  cidr_block        = cidrsubnet(var.cidr, 4, count.index)
-  availability_zone = local.availability_zones[count.index]
+  vpc_id                  = aws_vpc.main.id
+  count                   = var.availability_zones
+  cidr_block              = cidrsubnet(var.cidr, 4, count.index)
+  availability_zone       = local.availability_zones[count.index]
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "${var.service}-${var.environment}-pub-sn-${count.index}"
+  }
 }
 
 resource "aws_subnet" "private" {
@@ -47,4 +51,7 @@ resource "aws_subnet" "private" {
   count             = var.availability_zones
   cidr_block        = cidrsubnet(var.cidr, 4, (8 + count.index))
   availability_zone = local.availability_zones[count.index]
+  tags = {
+    Name = "${var.service}-${var.environment}-priv-sn-${count.index}"
+  }
 }

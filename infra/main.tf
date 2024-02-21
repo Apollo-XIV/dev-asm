@@ -10,5 +10,9 @@ module "network" {
 }
 
 module "cluster" {
-  source = "./modules/cluster"
+  source      = "./modules/cluster"
+  service     = var.service
+  environment = var.environment
+  subnet_ids  = module.network.subnet_ids
+  vpc_id      = module.network.vpc_id
 }
