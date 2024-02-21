@@ -5,19 +5,19 @@ resource "aws_instance" "cluster_mgr" {
   subnet_id       = var.subnet_ids.public[0]
   security_groups = [aws_security_group.node.id]
 
-  key_name = aws_key_pair.node_key.key_name
+  key_name = aws_key_pair.node_key_2.key_name
 
   # user_data = "sudo  upgrade"
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("${path.module}/node_key")
+    private_key = file("${path.module}/node_key_2")
     host        = self.public_ip
   }
 
   provisioner "remote-exec" {
-    script = "${path.module}/docker.sh"
+    script = "${path.module}/install-docker.sh"
   }
 
   provisioner "remote-exec" {
@@ -39,17 +39,17 @@ resource "aws_instance" "cluster_node" {
   subnet_id       = var.subnet_ids.public[0]
   security_groups = [aws_security_group.node.id]
 
-  key_name = aws_key_pair.node_key.key_name
+  key_name = aws_key_pair.node_key_2.key_name
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("${path.module}/node_key")
+    private_key = file("${path.module}/node_key_2")
     host        = self.public_ip
   }
 
   provisioner "remote-exec" {
-    script = "${path.module}/docker.sh"
+    script = "${path.module}/install-docker.sh"
   }
 
   provisioner "remote-exec" {
@@ -86,7 +86,7 @@ data "aws_ami" "aws_linux" {
   owners = ["137112412989"] # Aws
 }
 
-resource "aws_key_pair" "node_key" {
-  key_name   = "node_key"
-  public_key = file("${path.module}/node_key.pub")
+resource "aws_key_pair" "node_key_2" {
+  key_name   = "node_key_2"
+  public_key = file("${path.module}/node_key_2.pub")
 }

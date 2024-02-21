@@ -1,1 +1,20 @@
+---
+- name: Create Docker Service
+  hosts: managers
+  remote_user: ec2-user
 
+  tasks:
+  - name: Create new Service
+    community.docker.docker_swarm_service:
+        name: webserver
+        image: ghcr.io/Apollo-XIV/dev-asm:latest
+        update_config:
+          parallellism: 2
+          delay: 10s
+          order: stop-first
+        reservations:
+          cpus: 0.25
+          memory: 20M
+        limits:
+          cpus: 0.50
+          reservations: 20M
