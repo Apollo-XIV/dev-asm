@@ -1,0 +1,15 @@
+- name: Hello World
+  hosts: all
+  become: true
+  vars:
+    simple_file: ~/simple-file.txt
+  tasks:
+    - ansible.builtin.file:
+        path: "{{ simple_file }}"
+        state: touch	
+    - package:
+        name: nginx
+        state: present
+    - service:
+        name: nginx
+        state: started

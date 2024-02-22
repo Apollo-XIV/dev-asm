@@ -1,6 +1,8 @@
-provider "aws" {
-  region = "eu-west-1"
-}
+
+# module "ansible" {
+#   source    = "./playbooks"
+#   hostnames = module.cluster.hostnames
+# }
 
 module "network" {
   source      = "./modules/network"
