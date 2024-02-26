@@ -49,13 +49,14 @@ resource "aws_lb_target_group" "public" {
 }
 
 resource "aws_lb_target_group_attachment" "all" {
-  for_each         = toset(local.targets)
+  count            = length(local.targets)
   target_group_arn = aws_lb_target_group.public.arn
-  target_id        = each.key
+  target_id        = local.targets[count.index]
   port             = 80
+  depends_on       = [aws_instance.bootstrap, aws_instance.managers, aws_instance.workers]
 }
 
 locals {
-  targets = flatten([aws_instance.bootstrap[*].id, aws_instance.workers[*].id, aws_instance.managers[*].id])
+  targets = flatten([aws_instance.bootstrap[*].private_ip, aws_instance.workers[*].private_ip, aws_instance.managers[*].private_ip])
 
 }

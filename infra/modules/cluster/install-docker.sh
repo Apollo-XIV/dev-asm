@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 sudo yum update -y
 sudo yum install -y docker python3 pip
 sudo yum remove -y python-requests aws-cli

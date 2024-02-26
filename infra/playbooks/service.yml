@@ -9,17 +9,17 @@
         replicas: 1
         resolve_image: true # update based on digest (i.e even if latest)
         publish:
-          - mode: host
+          - mode: ingress
             published_port: 80
             target_port: 80
-        healthcheck:
-          # Check if nginx server is healthy by curl'ing the server.
-          # If this fails or timeouts, the healthcheck fails.
-          test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
-          interval: 1m30s
-          timeout: 10s
-          retries: 3
-          start_period: 30s
+        # healthcheck:
+        #   # Check if nginx server is healthy by curl'ing the server.
+        #   # If this fails or timeouts, the healthcheck fails.
+        #   test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
+        #   interval: 1m30s
+        #   timeout: 10s
+        #   retries: 3
+        #   start_period: 30s
         update_config:
           parallelism: 2
           delay: 10s

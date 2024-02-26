@@ -5,14 +5,14 @@ resource "aws_instance" "bootstrap" {
   subnet_id              = var.subnet_ids.public[0]
   vpc_security_group_ids = [aws_security_group.node.id]
 
-  key_name = aws_key_pair.node_key.key_name
+  key_name = aws_key_pair.node_key_2.key_name
 
   # user_data = "sudo  upgrade"
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("${path.module}/node_key")
+    private_key = file("${path.module}/node_key_2")
     host        = self.public_dns
   }
 
@@ -39,12 +39,12 @@ resource "aws_instance" "workers" {
   subnet_id              = var.subnet_ids.public[0]
   vpc_security_group_ids = [aws_security_group.node.id]
 
-  key_name = aws_key_pair.node_key.key_name
+  key_name = aws_key_pair.node_key_2.key_name
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("${path.module}/node_key")
+    private_key = file("${path.module}/node_key_2")
     host        = self.public_ip
   }
 
@@ -71,12 +71,12 @@ resource "aws_instance" "managers" {
   subnet_id              = var.subnet_ids.public[0]
   vpc_security_group_ids = [aws_security_group.node.id]
 
-  key_name = aws_key_pair.node_key.key_name
+  key_name = aws_key_pair.node_key_2.key_name
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("${path.module}/node_key")
+    private_key = file("${path.module}/node_key_2")
     host        = self.public_ip
   }
 
@@ -118,7 +118,7 @@ data "aws_ami" "aws_linux" {
   owners = ["137112412989"] # Aws
 }
 
-resource "aws_key_pair" "node_key" {
-  key_name   = "node_key"
-  public_key = file("${path.module}/node_key.pub")
+resource "aws_key_pair" "node_key_2" {
+  key_name   = "node_key_2"
+  public_key = file("${path.module}/node_key_2.pub")
 }

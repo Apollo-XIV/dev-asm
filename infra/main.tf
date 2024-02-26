@@ -9,6 +9,7 @@ module "network" {
   cidr        = var.cidr
   service     = var.service
   environment = var.environment
+  availability_zones = 2
 }
 
 module "cluster" {

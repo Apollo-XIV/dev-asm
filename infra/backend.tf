@@ -1,10 +1,10 @@
 terraform {
-  # backend "s3" {
-  #   bucket         = "forum-dev-state"
-  #   key            = "terraform.tfstate"
-  #   region         = "eu-west-1"
-  #   dynamodb_table = "forum-dev-state-lock-table"
-  # }
+  backend "s3" {
+    bucket         = "forum-dev-statebucket"
+    key            = "terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "forum-dev-locktable"
+  }
 
   required_providers {
     aws = {
