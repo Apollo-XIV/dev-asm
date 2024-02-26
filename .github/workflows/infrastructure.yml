@@ -5,18 +5,18 @@ on:
 
 jobs:
   deploy-infra:
-  name: Deploy infra
-  runs-on: ubuntu-latest
-  defaults:
-  run:
-  working-directory: infra/
+    name: Deploy infra
+    runs-on: ubuntu-latest
+    defaults:
+    run:
+    working-directory: infra/
 
-  steps:
-  - name: Checkout
-    uses: actions/checkout@v3
-  - name: Create tfvars
-    run: echo '${{secrets.TFVARS}}' >> secrets.auto.tfvars
-  - name: Terraform Apply
-    uses: sturlabragason/terraform_state_artifact@v1
-    with:
-      encryptionkey: ${{ secrets.TF_STATE_SECRET }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Create tfvars
+      run: echo '${{secrets.TFVARS}}' >> secrets.auto.tfvars
+    - name: Terraform Apply
+      uses: sturlabragason/terraform_state_artifact@v1
+      with:
+        encryptionkey: ${{ secrets.TF_STATE_SECRET }}
