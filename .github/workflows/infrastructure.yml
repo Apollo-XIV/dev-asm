@@ -16,6 +16,4 @@ jobs:
     - name: Create tfvars
       run: echo '${{secrets.TFVARS}}' >> secrets.auto.tfvars
     - name: Terraform Apply
-      uses: sturlabragason/terraform_state_artifact@v1
-      with:
-        encryptionkey: ${{ secrets.TF_STATE_SECRET }}
+      run: terraform apply --auto-approve
