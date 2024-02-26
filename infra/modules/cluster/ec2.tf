@@ -32,7 +32,7 @@ resource "aws_instance" "bootstrap" {
 }
 
 resource "aws_instance" "workers" {
-  count         = 2
+  count         = 0
   ami           = data.aws_ami.aws_linux.id
   instance_type = "t3.micro"
 

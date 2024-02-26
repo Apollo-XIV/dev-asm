@@ -2,4 +2,5 @@ collections:
   - name: https://github.com/ansible-collections/cloud.terraform.git
     type: git
     version: main
+  - name: community.docker
     

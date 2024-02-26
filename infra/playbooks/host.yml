@@ -1,0 +1,20 @@
+---
+- name: Configure Host
+  hosts: all
+  become: true
+  tasks:
+    - name: install dependencies
+      yum:
+        name: "{{ item }}"
+        update_cache: yes
+      loop:
+        - vim
+        - python3
+        - pip
+    - name: install ansible-docker deps
+      shell: /usr/bin/pip install docker
+    - name: start docker service
+      service:
+        enabled: true
+        name: docker
+        state: started    
