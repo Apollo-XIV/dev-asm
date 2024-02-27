@@ -1,5 +1,7 @@
 FROM rust:latest AS builder
-RUN cargo install cargo-leptos && rustup target add wasm32-unknown-unknown && mkdir -p /app
+RUN cargo install cargo-leptos
+RUN rustup target add wasm32-unknown-unknown 
+RUN mkdir -p /app
 WORKDIR /app
 COPY . .
 RUN cargo leptos build -r -vv

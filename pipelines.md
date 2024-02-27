@@ -3,8 +3,8 @@
 ## Required Github Secrets
 - TF_STATE_SECRET
 - TFVARS
-- AWS_ACCOUNT_ID
-- AWS_ACCOUNT_SECRET
+- AWS_ACCOUNT_KEY
+- AWS_SECRET_KEY
 
 ## Required App Secrets
 - DB_URL
