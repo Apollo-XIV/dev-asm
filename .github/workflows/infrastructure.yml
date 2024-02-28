@@ -15,6 +15,9 @@ jobs:
       uses: actions/checkout@v3
     - name: Create tfvars
       run: echo '${{secrets.TFVARS}}' >> secrets.auto.tfvars
+    - name: Use Node Key
+      run: |
+        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key
     - name: Sign in to AWS CLI
       run: |
         mkdir $HOME/.aws && \
