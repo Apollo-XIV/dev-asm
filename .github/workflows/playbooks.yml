@@ -24,6 +24,6 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: inventory
-        path: inventory.yml
+        path: infra/playbooks/inventory.yml
     - name: test service
       run: ansible-playbook -i inventory.yml service.yml
