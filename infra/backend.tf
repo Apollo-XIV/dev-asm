@@ -1,9 +1,11 @@
 terraform {
   backend "s3" {
-    bucket         = "forum-dev-statebucket"
-    key            = "terraform.tfstate"
-    region         = "eu-west-1"
-    dynamodb_table = "forum-dev-locktable"
+    bucket                   = "forum-dev-statebucket"
+    key                      = "terraform.tfstate"
+    region                   = "eu-west-1"
+    dynamodb_table           = "forum-dev-locktable"
+    profile                  = "default"
+    shared_credentials_files = ["$HOME/.aws/credentials"]
   }
 
   required_providers {
