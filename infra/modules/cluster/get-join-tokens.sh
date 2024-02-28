@@ -7,8 +7,8 @@ set -e
 eval "$(jq -r '@sh "HOST=\(.host)"')"
 
 # Get worker join token
-WORKER=$(ssh -i node_key_2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@$HOST docker swarm join-token worker -q)
-MANAGER=$(ssh -i node_key_2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@$HOST docker swarm join-token manager -q)
+WORKER=$(ssh -i node_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@$HOST docker swarm join-token worker -q)
+MANAGER=$(ssh -i node_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@$HOST docker swarm join-token manager -q)
 
 # Pass back a JSON object
 jq -n --arg worker $WORKER --arg manager $MANAGER '{"worker":$worker,"manager":$manager}'

@@ -7,7 +7,7 @@ managers:
   %{~ endfor ~}
   vars:
     ansible_user: ec2-user
-    ansible_ssh_private_key_file: ../modules/cluster/node_key_2
+    ansible_ssh_private_key_file: ../modules/cluster/node_key
 workers:
   hosts:
   %{~ for ec2_name, address in workers ~}
@@ -16,4 +16,4 @@ workers:
   %{~ endfor ~}
   vars:
     ansible_user: ec2-user
-    ansible_ssh_private_key_file: ../modules/cluster/node_key_2
+    ansible_ssh_private_key_file: ../modules/cluster/node_key
