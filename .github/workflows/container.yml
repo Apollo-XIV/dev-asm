@@ -16,6 +16,6 @@ jobs:
         username: ${{github.actor}}
         password: ${{secrets.GITHUB_TOKEN}}
     - name: build image
-      run: docker build # docker build command goes here
+      run: docker build -t ghcr.io/apollo-xiv/dev-asm . # docker build command goes here
     - name: push image
       run: docker push ghcr.io/apollo-xiv/dev-asm:latest
