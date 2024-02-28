@@ -1,6 +1,9 @@
 FROM rust:latest AS builder
 RUN apt-get update && apt-get upgrade -y
-RUN cargo install cargo-leptos
+RUN wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
+RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
+RUN cp cargo-binstall /usr/local/cargo/bin
+RUN cargo binstall cargo-leptos -y
 ARG SQLX_OFFLINE=true
 RUN cargo install trunk
 RUN mkdir -p /app
@@ -19,7 +22,7 @@ RUN cargo leptos build -r -vv
 FROM alpine:latest
 WORKDIR /app
 
-COPY --from=builder /app/target /app
+COPY --from=builder /app/target/release/dev-asm /app/
 COPY --from=builder /app/target/site /app/site
 
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
@@ -28,4 +31,4 @@ ENV LEPTOS_SITE_PKG_DIR="pkg"
 ENV LEPTOS_SITE_ADDRESS="0.0.0.0:3000"
 
 EXPOSE 3000
-CMD [""]
+CMD ["/app/dev-asm"]
