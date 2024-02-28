@@ -22,7 +22,7 @@ RUN cargo leptos build -r -vv
 FROM alpine:latest
 WORKDIR /app
 
-COPY --from=builder /app/target/release/dev-asm /app/
+COPY --from=builder /app/target/release/dev-asm /app/dev-asm
 COPY --from=builder /app/target/site /app/site
 
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
