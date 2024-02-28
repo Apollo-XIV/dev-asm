@@ -17,7 +17,8 @@ jobs:
       run: echo '${{secrets.TFVARS}}' >> secrets.auto.tfvars
     - name: Use Node Key
       run: |
-        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key
+        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key && \
+        chmod 600 /modules/cluster/node_key
     - name: Sign in to AWS CLI
       run: |
         mkdir $HOME/.aws && \
@@ -25,7 +26,6 @@ jobs:
         echo aws_access_key_id = ${{secrets.AWS_ACCESS_KEY}} >> $HOME/.aws/credentials && \
         echo aws_secret_access_key = ${{secrets.AWS_SECRET_KEY}} >> $HOME/.aws/credentials
     - run: cat $HOME/.aws/credentials
-    - run: echo $AWS_PROFILE
     - name: Terraform Init
       run: terraform init
     - name: Terraform Apply
