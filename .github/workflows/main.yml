@@ -29,11 +29,15 @@ jobs:
   terraform-destroy:
     name: Destroy Infrastructure
     needs: [run-playbooks]
+    defaults:
+      run:
+        working-directory: infra/
     runs-on: ubuntu-latest
     steps:
     - name: Use Node Key
       run: |
-        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key
+        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key && \
+        chmod 600 modules/cluster/node_key
     - name: Sign in to AWS CLI
       run: |
         mkdir $HOME/.aws && \

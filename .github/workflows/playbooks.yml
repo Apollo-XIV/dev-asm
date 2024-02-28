@@ -7,19 +7,23 @@ jobs:
   run-playbooks:
     name: run playbooks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/playbooks
     steps:
     - uses: actions/checkout@v3
     - name: Setup Ansible
       run: |
         sudo apt install -y pipx
         pipx install --include-deps ansible
-
-    - uses: docker/login-action@v1
+    - name: Use Node Key
+      run: |
+        echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > ../modules/cluster/node_key && \
+        chmod 600 ../modules/cluster/node_key
+    - name: download inventory.yml
+      uses: actions/download-artifact@v4
       with:
-        registry: ghcr.io
-        username: ${{github.actor}}
-        password: ${{secrets.GITHUB_TOKEN}}
-    - name: build image
-      run: docker build # docker build command goes here
-    - name: push image
-      run: docker push ghcr.io/apollo-xiv/dev-asm:latest
+        name: inventory
+        path: inventory.yml
+    - name: test service
+      run: ansible-playbook -i inventory.yml service.yml
