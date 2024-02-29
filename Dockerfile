@@ -17,15 +17,16 @@ RUN ln -s /usr/bin/clang-17 /usr/bin/clang
 WORKDIR /app
 COPY . .
 RUN rustup target add wasm32-unknown-unknown
+ENV LEPTOS_OUTPUT_NAME="dev-asm"
 RUN cargo leptos build -r -vv
 
 FROM alpine:latest
+
+COPY --from=builder /app/target/release/dev-asm /app/
+COPY --from=builder /app/target/site /app/site
+COPY --from=builder /app/Cargo.toml /app/
 WORKDIR /app
 
-COPY --from=builder /app/target/release/dev-asm /app/dev-asm
-COPY --from=builder /app/target/site /app/site
-
-ENV LEPTOS_OUTPUT_NAME="dev-asm"
 ENV LEPTOS_SITE_ROOT="site"
 ENV LEPTOS_SITE_PKG_DIR="pkg"
 ENV LEPTOS_SITE_ADDRESS="0.0.0.0:3000"
