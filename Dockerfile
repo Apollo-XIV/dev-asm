@@ -1,4 +1,4 @@
-FROM rust:latest AS builder
+FROM rustlang/rust:nightly-bullseye AS builder
 RUN apt-get update && apt-get upgrade -y
 RUN wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
 RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
@@ -20,7 +20,7 @@ RUN rustup target add wasm32-unknown-unknown
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
 RUN cargo leptos build -r -vv
 
-FROM alpine:latest
+FROM rustlang/rust:nightly-bullseye
 
 COPY --from=builder /app/target/release/dev-asm /app/
 COPY --from=builder /app/target/site /app/site
