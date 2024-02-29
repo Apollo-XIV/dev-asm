@@ -11,7 +11,7 @@ jobs:
       run:
         working-directory: infra/playbooks
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Ansible
       run: |
         sudo apt install -y pipx

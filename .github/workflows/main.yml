@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Use Node Key
       run: |
         echo "$(echo ${{secrets.NODE_KEY_64}} | base64 -d)" > modules/cluster/node_key && \
