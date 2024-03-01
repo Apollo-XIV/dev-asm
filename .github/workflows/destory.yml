@@ -7,7 +7,6 @@ on:
 jobs:
   terraform-destroy:
     name: Destroy Infrastructure
-    needs: [run-playbooks]
     defaults:
       run:
         working-directory: infra/
