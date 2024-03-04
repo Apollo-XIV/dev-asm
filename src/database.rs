@@ -1,9 +1,10 @@
+use crate::DATABASE_URL;
 use sqlx::{postgres::PgPoolOptions, PgPool, Pool};
 
 static DB: std::sync::OnceLock<sqlx::PgPool> = std::sync::OnceLock::new();
 
 async fn create_pool() -> sqlx::PgPool {
-    let database_url = std::env::var("DATABASE_URL").expect("no database url specified");
+    let database_url = DATABASE_URL.clone();
     let pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(4)
         .connect(database_url.as_str())

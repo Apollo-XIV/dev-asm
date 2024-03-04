@@ -35,20 +35,25 @@ use std::sync::Mutex;
 pub static RQ: Lazy<Mutex<Client>> = Lazy::new(|| Mutex::new(Client::new()));
 
 #[cfg(feature = "ssr")]
+fn get_secret(key: &str) -> String {
+    std::env::var(key)
+        .or_else(|_x| read_secret_from_file(key))
+        .expect("could not find required secrets in the environment")
+}
+
+#[cfg(feature = "ssr")]
+fn read_secret_from_file(key: &str) -> Result<String, String> {
+    std::fs::read_to_string(format!("/run/secrets/{}", key))
+        .map_err(|_e| "Could not read from file".to_string())
+}
+
+#[cfg(feature = "ssr")]
 use lazy_static::lazy_static;
+
 #[cfg(feature = "ssr")]
 lazy_static! {
     pub static ref CLIENT_ID: String = get_secret("GITHUB_CLIENT_ID");
     pub static ref CLIENT_SECRET: String = get_secret("GITHUB_CLIENT_SECRET");
     pub static ref AUTH_SECRET: String = get_secret("AUTH_SECRET");
-
-    fn get_secret(key: &str) -> String {
-        std::env::var(key)
-            .or_else(|x| read_secret_from_file(key))
-            .expect("could not find required secrets in the environment")
-    }
-
-    fn read_secret_from_file(key: &str) -> Result<String, String> {
-        std::fs::read_to_string(format!("/run/secrets/{}", key))
-    }
+    pub static ref DATABASE_URL: String = get_secret("DATABASE_URL");
 }
