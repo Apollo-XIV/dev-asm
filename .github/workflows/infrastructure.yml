@@ -1,4 +1,4 @@
-name: Infrastructure
+name: Deploy Infra
 
 on:
   workflow_call:
