@@ -21,6 +21,10 @@ RUN rustup target add wasm32-unknown-unknown
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
 RUN cargo leptos build -r -vv
 
+
+
+
+
 FROM rustlang/rust:nightly-bullseye
 
 COPY --from=builder /app/target/release/dev-asm /app/
