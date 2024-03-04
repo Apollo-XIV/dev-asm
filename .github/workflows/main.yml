@@ -26,9 +26,9 @@ jobs:
     needs: [build-image, infra]
     secrets: inherit          
 
-  terraform-destroy:
-    name: Destroy Infrastructure
-    uses: ./.github/workflows/destroy.yml
-    needs: [run-playbooks]
-    secrets: inherit
+  # terraform-destroy:
+  #   name: Destroy Infrastructure
+  #   uses: ./.github/workflows/destroy.yml
+  #   needs: [run-playbooks]
+  #   secrets: inherit
     
