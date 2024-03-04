@@ -5,11 +5,11 @@ RUN tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
 RUN cp cargo-binstall /usr/local/cargo/bin
 RUN cargo binstall cargo-leptos -y
 ARG SQLX_OFFLINE=true
-RUN cargo install trunk
+RUN cargo binstall trunk
 RUN mkdir -p /app
 RUN wget https://apt.llvm.org/llvm.sh
 RUN apt-get install -y lsb-release gnupg software-properties-common wget
-RUN apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main"
+RUN apt-add-repository "deb [trusted=yes] http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main"
 RUN apt-get update && apt-get upgrade -y
 RUN chmod +x llvm.sh
 RUN ./llvm.sh 17
