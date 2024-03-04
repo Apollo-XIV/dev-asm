@@ -4,8 +4,8 @@
   tasks:
     - name: Docker Swarm Service
       community.docker.docker_swarm_service:
-        name: nginx
-        image: nginx
+        name: dev-asm
+        image: ghcr.io/apollo-xiv/dev-asm
         replicas: 1
         resolve_image: true # update based on digest (i.e even if latest)
         publish:
@@ -13,9 +13,9 @@
             published_port: 80
             target_port: 80
         # healthcheck:
-        #   # Check if nginx server is healthy by curl'ing the server.
+        #   # Check if ghcr.io/apollo-xiv/dev-asm server is healthy by curl'ing the server.
         #   # If this fails or timeouts, the healthcheck fails.
-        #   test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
+        #   test: ["CMD", "curl", "--fail", "]
         #   interval: 1m30s
         #   timeout: 10s
         #   retries: 3
@@ -35,3 +35,10 @@
         limits:
           cpus: 0.50
           memory: 50M
+- name: Docker Secrets
+  hosts: managers[0]
+  tasks:
+    - name: Docker Swarm Secrets
+      community.docker.docker_secret:
+        name: dev-asm
+        data: test
