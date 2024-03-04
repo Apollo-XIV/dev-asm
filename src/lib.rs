@@ -38,8 +38,17 @@ pub static RQ: Lazy<Mutex<Client>> = Lazy::new(|| Mutex::new(Client::new()));
 use lazy_static::lazy_static;
 #[cfg(feature = "ssr")]
 lazy_static! {
-    pub static ref CLIENT_ID: String = std::env::var("GITHUB_CLIENT_ID").expect("ENV VAR NOT SET");
-    pub static ref CLIENT_SECRET: String =
-        std::env::var("GITHUB_CLIENT_SECRET").expect("ENV VAR NOT SET");
-    pub static ref AUTH_SECRET: String = std::env::var("AUTH_SECRET").expect("ENV VAR NOT SET");
+    pub static ref CLIENT_ID: String = get_secret("GITHUB_CLIENT_ID");
+    pub static ref CLIENT_SECRET: String = get_secret("GITHUB_CLIENT_SECRET");
+    pub static ref AUTH_SECRET: String = get_secret("AUTH_SECRET");
+
+    fn get_secret(key: &str) -> String {
+        std::env::var(key)
+            .or_else(|x| read_secret_from_file(key))
+            .expect("could not find required secrets in the environment")
+    }
+
+    fn read_secret_from_file(key: &str) -> Result<String, String> {
+        std::fs::read_to_string(format!("/run/secrets/{}", key))
+    }
 }

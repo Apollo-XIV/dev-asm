@@ -21,5 +21,15 @@ jobs:
       with:
         name: inventory
         path: infra/playbooks
-    - name: test service
+    - name: download cx_secret
+      uses: actions/download-artifact@v4
+      with:
+        name: cx_string
+        path: infra/playbooks
+    - name: Create secret files
+      run: |
+          echo ${{secrets.AUTH_SECRET}} > ./auth_secret && \
+          echo ${{secrets.GITHUB_CLIENT_ID}} > ./github_client_id && \
+          echo ${{secrets.GITHUB_CLIENT_SECRET}} > ./github_client_secret
+    - name: Deploy Service
       run: ansible-playbook -i inventory.yml service.yml

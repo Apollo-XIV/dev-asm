@@ -36,3 +36,8 @@ jobs:
       with:
         name: inventory
         path: infra/playbooks/inventory.yml
+    - name: save cx_string as artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: cx_string
+        path: infra/playbooks/cx_string

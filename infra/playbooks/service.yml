@@ -38,7 +38,27 @@
 - name: Docker Secrets
   hosts: managers[0]
   tasks:
-    - name: Docker Swarm Secrets
+    - name: Secret - GITHUB_CLIENT_ID
       community.docker.docker_secret:
-        name: dev-asm
-        data: test
+        name: CLIENT_ID
+        data: "{{lookup('file', './github_client_id') | b64encode}}"
+        data_is_b64: true
+        state: present
+    - name: Secret - GITHUB_CLIENT_SECRET
+      community.docker.docker_secret:
+        name: CLIENT_SECRET
+        data: "{{lookup('file', './github_client_secret') | b64encode}}"
+        data_is_b64: true
+        state: present
+    - name: Secret - AUTH_SECRET
+      community.docker.docker_secret:
+        name: AUTH_SECRET
+        data: "{{lookup('file', './auth_secret') | b64encode}}"
+        data_is_b64: true
+        state: present
+    - name: Secret - CX_STRING
+      community.docker.docker_secret:
+        name: DATABASE_URL
+        data: "{{lookup('file', './cx_string') | b64encode}}"
+        data_is_b64: true
+        state: present

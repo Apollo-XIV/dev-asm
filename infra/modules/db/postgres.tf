@@ -12,3 +12,8 @@ resource "aws_db_instance" "default" {
 output "db_cx_string" {
   value = aws_db_instance.default.endpoint
 }
+
+resource "local_file" "cx_string" {
+  filename = "playbooks/cx_string"
+  content  = aws_db_instance.default.endpoint
+}
