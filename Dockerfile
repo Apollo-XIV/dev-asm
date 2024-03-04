@@ -9,7 +9,8 @@ RUN cargo binstall trunk -y
 RUN mkdir -p /app
 RUN wget https://apt.llvm.org/llvm.sh
 RUN apt-get install -y lsb-release gnupg software-properties-common wget
-RUN apt-add-repository "deb [trusted=yes] http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main"
+RUN apt-add-repository "deb [trusted=yes] http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-17 main"
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 RUN apt-get update && apt-get upgrade -y
 RUN chmod +x llvm.sh
 RUN ./llvm.sh 17
