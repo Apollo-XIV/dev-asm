@@ -29,7 +29,7 @@ jobs:
     - name: Create secret files
       run: |
           echo ${{secrets.AUTH_SECRET}} > ./auth_secret && \
-          echo ${{secrets.GITHUB_CLIENT_ID}} > ./github_client_id && \
-          echo ${{secrets.GITHUB_CLIENT_SECRET}} > ./github_client_secret
+          echo ${{secrets.CLIENT_ID}} > ./github_client_id && \
+          echo ${{secrets.CLIENT_SECRET}} > ./github_client_secret
     - name: Deploy Service
       run: ansible-playbook -i inventory.yml service.yml
