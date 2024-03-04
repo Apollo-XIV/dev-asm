@@ -1,5 +1,5 @@
 
-name: Dispatch Jobs on Push to Main
+name: Pipeline
 
 on:
   push:
