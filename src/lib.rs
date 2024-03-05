@@ -44,7 +44,7 @@ fn get_secret(key: &str) -> String {
 #[cfg(feature = "ssr")]
 fn read_secret_from_file(key: &str) -> Result<String, String> {
     std::fs::read_to_string(format!("/run/secrets/{}", key))
-        .map_err(|_e| "Could not read from file".to_string())
+        .map_err(|_e| format!("Could not read {} from file", key))
 }
 
 #[cfg(feature = "ssr")]
