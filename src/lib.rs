@@ -38,7 +38,7 @@ pub static RQ: Lazy<Mutex<Client>> = Lazy::new(|| Mutex::new(Client::new()));
 fn get_secret(key: &str) -> String {
     std::env::var(key)
         .or_else(|_x| read_secret_from_file(key))
-        .expect("could not find required secrets in the environment")
+        .expect("Required Env. Vars not found")
 }
 
 #[cfg(feature = "ssr")]
