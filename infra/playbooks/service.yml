@@ -35,6 +35,11 @@
         limits:
           cpus: 0.50
           memory: 50M
+        secrets:
+          - secret_name: CLIENT_ID
+          - secret_name: CLIENT_SECRET
+          - secret_name: AUTH_SECRET
+          - secret_name: DATABASE_URL
 - name: Docker Secrets
   hosts: managers[0]
   tasks:
