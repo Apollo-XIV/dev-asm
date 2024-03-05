@@ -32,14 +32,14 @@
     - name: Docker Swarm Service
       community.docker.docker_swarm_service:
         name: dev-asm
-        image: ghcr.io/apollo-xiv/dev-asm
+        image: nginx #ghcr.io/apollo-xiv/dev-asm
         replicas: 1
         resolve_image: true # update based on digest (i.e even if latest)
         force_update: true
         publish:
           - mode: ingress
             published_port: 80
-            target_port: 3000
+            target_port: 80
         # healthcheck:
         #   # Check if ghcr.io/apollo-xiv/dev-asm server is healthy by curl'ing the server.
         #   # If this fails or timeouts, the healthcheck fails.
