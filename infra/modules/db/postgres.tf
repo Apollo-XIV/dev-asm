@@ -11,6 +11,11 @@ resource "aws_db_instance" "default" {
   storage_encrypted    = true
 }
 
+resource "aws_db_subnet_group" "forum" {
+  name       = "forum_snets"
+  subnet_ids = var.subnet_ids.public[*]
+}
+
 resource "random_password" "db_key" {
   length           = 16
   special          = true
