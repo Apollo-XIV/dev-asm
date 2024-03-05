@@ -3,7 +3,7 @@ resource "aws_db_instance" "default" {
   allocated_storage      = 5
   db_name                = "forum"
   db_subnet_group_name   = aws_db_subnet_group.forum.name
-  vpc_security_group_ids = [aws_security_group.db]
+  vpc_security_group_ids = [aws_security_group.db.id]
   publicly_accessible    = true
   engine                 = "postgres"
   instance_class         = "db.t3.micro"
