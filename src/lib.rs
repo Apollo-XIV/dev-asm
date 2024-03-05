@@ -52,8 +52,8 @@ use lazy_static::lazy_static;
 
 #[cfg(feature = "ssr")]
 lazy_static! {
-    pub static ref CLIENT_ID: String = get_secret("GITHUB_CLIENT_ID");
-    pub static ref CLIENT_SECRET: String = get_secret("GITHUB_CLIENT_SECRET");
+    pub static ref CLIENT_ID: String = get_secret("CLIENT_ID");
+    pub static ref CLIENT_SECRET: String = get_secret("CLIENT_SECRET");
     pub static ref AUTH_SECRET: String = get_secret("AUTH_SECRET");
     pub static ref DATABASE_URL: String = get_secret("DATABASE_URL");
 }
