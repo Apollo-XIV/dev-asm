@@ -1,4 +1,3 @@
-
 # module "ansible" {
 #   source    = "./playbooks"
 #   hostnames = module.cluster.hostnames
@@ -18,10 +17,14 @@ module "cluster" {
   environment = var.environment
   subnet_ids  = module.network.subnet_ids
   vpc_id      = module.network.vpc_id
+  db_sec_grp  = module.database.sec_grp_id
 }
 
 module "database" {
-  source     = "./modules/db"
-  subnet_ids = module.network.subnet_ids
+  source      = "./modules/db"
+  service     = var.service
+  environment = var.environment
+  subnet_ids  = module.network.subnet_ids
+  vpc_id      = module.network.vpc_id
 }
 

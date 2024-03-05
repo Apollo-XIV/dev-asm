@@ -1,15 +1,16 @@
 
 resource "aws_db_instance" "default" {
-  allocated_storage    = 5
-  db_name              = "forum"
-  db_subnet_group_name = aws_db_subnet_group.forum.name
-  publicly_accessible  = true
-  engine               = "postgres"
-  instance_class       = "db.t3.micro"
-  username             = "backend"
-  password             = random_password.db_key.result
-  skip_final_snapshot  = true
-  storage_encrypted    = true
+  allocated_storage      = 5
+  db_name                = "forum"
+  db_subnet_group_name   = aws_db_subnet_group.forum.name
+  vpc_security_group_ids = [aws_security_group.db]
+  publicly_accessible    = true
+  engine                 = "postgres"
+  instance_class         = "db.t3.micro"
+  username               = "backend"
+  password               = random_password.db_key.result
+  skip_final_snapshot    = true
+  storage_encrypted      = true
 }
 
 resource "aws_db_subnet_group" "forum" {
@@ -37,4 +38,11 @@ output "db_cx_string" {
 resource "local_sensitive_file" "cx_string" {
   filename = "playbooks/cx_string"
   content  = "postgres://backend:${random_password.db_key.result}@${aws_db_instance.default.endpoint}/${aws_db_instance.default.db_name}"
+}
+
+variable "vpc_id" {}
+variable "service" {}
+variable "environment" {}
+output "sec_grp_id" {
+  value = aws_security_group.db.id
 }

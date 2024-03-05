@@ -9,6 +9,7 @@ variable "subnet_ids" {
   })
 }
 
+variable "db_sec_grp" {}
 
 output "hostnames" {
   value = {

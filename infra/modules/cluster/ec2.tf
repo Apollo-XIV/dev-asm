@@ -3,7 +3,7 @@ resource "aws_instance" "bootstrap" {
   instance_type = "t3.micro"
 
   subnet_id              = var.subnet_ids.public[0]
-  vpc_security_group_ids = [aws_security_group.node.id]
+  vpc_security_group_ids = [aws_security_group.node.id, var.db_sec_grp]
 
   key_name = aws_key_pair.node_key.key_name
 
@@ -37,7 +37,7 @@ resource "aws_instance" "workers" {
   instance_type = "t3.micro"
 
   subnet_id              = var.subnet_ids.public[0]
-  vpc_security_group_ids = [aws_security_group.node.id]
+  vpc_security_group_ids = [aws_security_group.node.id, var.db_sec_grp]
 
   key_name = aws_key_pair.node_key.key_name
 
@@ -69,7 +69,7 @@ resource "aws_instance" "managers" {
   instance_type = "t3.micro"
 
   subnet_id              = var.subnet_ids.public[0]
-  vpc_security_group_ids = [aws_security_group.node.id]
+  vpc_security_group_ids = [aws_security_group.node.id, var.db_sec_grp]
 
   key_name = aws_key_pair.node_key.key_name
 
