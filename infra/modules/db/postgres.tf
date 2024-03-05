@@ -2,7 +2,7 @@
 resource "aws_db_instance" "default" {
   allocated_storage    = 5
   db_name              = "forum"
-  db_subnet_group_name = var.subnets.public[0]
+  db_subnet_group_name = var.subnet_ids.public[0]
   engine               = "postgres"
   instance_class       = "db.t3.micro"
   username             = "backend"
