@@ -21,6 +21,7 @@ module "cluster" {
 }
 
 module "database" {
-  source = "./modules/db"
+  source     = "./modules/db"
+  subnet_ids = module.network.subnet_ids
 }
 

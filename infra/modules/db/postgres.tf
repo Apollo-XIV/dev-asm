@@ -1,19 +1,34 @@
 
 resource "aws_db_instance" "default" {
-  allocated_storage           = 5
-  db_name                     = "forum"
-  engine                      = "postgres"
-  instance_class              = "db.t3.micro"
-  username                    = "backend"
-  manage_master_user_password = true
-  skip_final_snapshot         = true
+  allocated_storage    = 5
+  db_name              = "forum"
+  db_subnet_group_name = var.subnets.public[0]
+  engine               = "postgres"
+  instance_class       = "db.t3.micro"
+  username             = "backend"
+  password             = random_password.db_key.result
+  skip_final_snapshot  = true
+  storage_encrypted    = true
+}
+
+resource "random_password" "db_key" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>?"
+}
+
+variable "subnet_ids" {
+  type = object({
+    public  = list(string)
+    private = list(string)
+  })
 }
 
 output "db_cx_string" {
   value = aws_db_instance.default.endpoint
 }
 
-resource "local_file" "cx_string" {
+resource "local_sensitive_file" "cx_string" {
   filename = "playbooks/cx_string"
-  content  = aws_db_instance.default.endpoint
+  content  = "postgres://backend:${random_password.db_key.result}@${aws_db_instance.default.endpoint}/${aws_db_instance.default.db_name}"
 }
