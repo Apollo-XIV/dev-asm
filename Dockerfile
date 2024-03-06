@@ -21,7 +21,7 @@ RUN rustup target add wasm32-unknown-unknown
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
 RUN cargo leptos build -r -vv
 
-RUN yum install npm -y
+RUN apt-get install nodejs npm -y
 RUN npx tailwindcss -i style/tailwind.css -o tailwind-build.css
 
 
