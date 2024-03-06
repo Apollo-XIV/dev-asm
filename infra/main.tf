@@ -1,8 +1,3 @@
-# module "ansible" {
-#   source    = "./playbooks"
-#   hostnames = module.cluster.hostnames
-# }
-
 module "network" {
   source             = "./modules/network"
   cidr               = var.cidr
@@ -28,3 +23,7 @@ module "database" {
   vpc_id      = module.network.vpc_id
 }
 
+# module "ansible" {
+#   source    = "./playbooks"
+#   hostnames = module.cluster.hostnames
+# }

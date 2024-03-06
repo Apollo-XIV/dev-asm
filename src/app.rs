@@ -30,7 +30,7 @@ pub fn App() -> impl IntoView {
         />
 
         // sets the document title
-        <Title text="Welcome to Leptos"/>
+        <Title text="Dev-Asm"/>
 
         // content for this welcome page
         <Router>
