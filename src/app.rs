@@ -201,7 +201,7 @@ pub struct Test {
 #[server(GetDatabaseTest)]
 pub async fn get_database_test() -> Result<String, ServerFnError> {
     println!("testing");
-    Ok("I'm a button")
+    Ok("I'm a button".to_string())
 }
 
 /// 404 - Not Found
