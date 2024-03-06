@@ -32,7 +32,7 @@
     - name: Docker Swarm Service
       community.docker.docker_swarm_service:
         name: dev-asm
-        image: nginx #ghcr.io/apollo-xiv/dev-asm
+        image: ghcr.io/apollo-xiv/dev-asm
         replicas: 1
         resolve_image: true # update based on digest (i.e even if latest)
         force_update: true
