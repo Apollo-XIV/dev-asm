@@ -39,7 +39,7 @@
         publish:
           - mode: ingress
             published_port: 80
-            target_port: 80
+            target_port: 3000
         # healthcheck:
         #   # Check if ghcr.io/apollo-xiv/dev-asm server is healthy by curl'ing the server.
         #   # If this fails or timeouts, the healthcheck fails.
