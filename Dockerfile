@@ -26,7 +26,6 @@ FROM node:lts-bullseye as style-builder
 RUN mkdir -p /app
 WORKDIR /app
 COPY . .
-RUN apt-get install nodejs npm -y
 RUN npx tailwindcss -i style/tailwind.css -o tailwind-build.css
 
 
