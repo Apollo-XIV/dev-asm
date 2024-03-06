@@ -165,10 +165,10 @@ fn RecentThreads() -> impl IntoView {
         if let Some(x) = test_data.get() {
             match x {
                 Ok(x) => x,
-                _ => vec![],
+                _ => "".to_string(),
             }
         } else {
-            vec![]
+            "".to_string()
         }
     };
     view! {
@@ -183,21 +183,7 @@ fn RecentThreads() -> impl IntoView {
                         {count}
                     </div>
                     <p>
-
-                        {
-                            move || pending().then(|| "Test");
-                        }
-
-                    </p>
-                    <For each=unwrapped key=|state| state.id let:child>
-                        <p>{child.name}</p>
-                    </For>
-                    <p>
-                        {move || match test_data() {
-                            Some(test) => test.unwrap().first().unwrap().clone().name,
-                            None => "none".to_string(),
-                        }}
-
+                        "Temporary Data"
                     </p>
                 </ActionForm>
                 <Todo class="h-64"/>
