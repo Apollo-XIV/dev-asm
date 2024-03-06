@@ -21,7 +21,7 @@ resource "aws_db_subnet_group" "forum" {
 resource "random_password" "db_key" {
   length           = 16
   special          = true
-  override_special = "!#$%&*()-_=+[]{}<>?"
+  override_special = "-._~"
 }
 
 variable "subnet_ids" {
