@@ -21,12 +21,15 @@ RUN rustup target add wasm32-unknown-unknown
 ENV LEPTOS_OUTPUT_NAME="dev-asm"
 RUN cargo leptos build -r -vv
 
+RUN yum install npm -y
+RUN npx tailwindcss -i style/tailwind.css -o tailwind-build.css
 
 
 
 
 FROM rustlang/rust:nightly-bullseye
 
+COPY --from=builder /app/tailwind-build.css /app/site/tailwind.css
 COPY --from=builder /app/target/release/dev-asm /app/
 COPY --from=builder /app/target/site /app/site
 COPY --from=builder /app/Cargo.toml /app/
