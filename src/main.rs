@@ -1,6 +1,5 @@
 use cfg_if::cfg_if;
 use serde::{Deserialize, Serialize};
-
 // #[cfg(feature = "ssr")]
 // #[derive(Serialize, Deserialize, Clone, Debug)]
 // struct User {
